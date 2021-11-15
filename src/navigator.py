@@ -24,6 +24,19 @@ def main():
     results_num = getSearchResultsNumber(driver)
     print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
 
+    height = driver.execute_script("return document.documentElement.scrollHeight")
+    firstQuarter = height/4
+    halfway = height/2
+    lastQuarter = firstQuarter + halfway
+    
+    driver.execute_script("window.scrollTo(0, " + str(firstQuarter) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, " + str(halfway) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, " + str(lastQuarter) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(1)
     
     curr = 1
     while curr <= results_num:
@@ -182,12 +195,28 @@ def openSearchResults(driver, curr):
     finally:
         url = driver.find_element(By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]/li['+ str(curr) + ']/div[2]/div/div/div/article/section[@class="result-lockup"]/div/div/dl/dt[@class="result-lockup__name"]/a').get_attribute('href')
         test(driver, url)
+
+def grabDetails(driver):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, '//div[@class="container"]/div/div/div/div/dl/dt/span')))
+    except:
+        driver.quit()
+    finally:
+        fullname = driver.find_element(By.XPATH, '//div[@class="container"]/div/div/div/div/dl/dt/span').text
+        position = driver.find_element(By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt').text
+        location = driver.find_element(By.XPATH, '//div[@class="container"]/div/div/div/div/dl/dd[@class="mt4 mb0"]/div').text
+        print("Fullname : " + fullname)
+        print("Position : " + position)
+        print("Location : " + location)
+                             
     
 
 def test(driver, url):
     driver.execute_script("window.open('');")
     driver.switch_to.window(driver.window_handles[1])
     driver.get(url);
+    grabDetails(driver)
     time.sleep(3)
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
