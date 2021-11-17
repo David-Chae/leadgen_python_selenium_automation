@@ -6,43 +6,31 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 
-titles = ('Chief Marketing Officer', 'Chief Digital Officer', 'Content Manager', 'Digital Manager', 'Customer Experience Manager', 'Content Composer', 'Head of Marketing', 'Head of Digital', 'Head of Customer Experience' , 'Head of Digital Experience')
+titles = ('Chief Marketing Officer')
+#, 'Chief Digital Officer', 'Content Manager', 'Digital Manager', 'Customer Experience Manager', 'Content Composer', 'Head of Marketing', 'Head of Digital', 'Head of Customer Experience' , 'Head of Digital Experience')
 
 companies = ('AGL','Alinta Energy','ANZ Bank','Australia Post','Bank of Queensland','Bendigo Bank','BHP','CBA','Cenitex','Coles','Computershare','Crown','Dept of Defence','Dept of Health','Energy Aust','Frucor Suntory','GCP Asia Pacific','HCF','Just Group','Kmart','LeasePlan','Momentum Energy','Myer','NAB','NESA','Nufarm','NZ Police','Office Brands','Office Works','Orica','Origin Energy','QBE','QLD Dept of Transport','SA Health','SA Pathalology','Simply Energy','Stracco','Suncorp','The Good Guys/JB HiFi','The Star','Toll','Transport NSW','Westpac','Woolworths'
 )
 
 def main():
     driver = webdriver.Chrome()
+    
     loginToLinkedInSalesNav(driver)
     startEmptySearchInSalesNav(driver)
     selectGeographyInSearch(driver, "Australia")
-    selectTitlesInSearch(driver, titles)
+    selectTitleInSearch(driver, 'Chief Marketing Officer')
+    selectFunctionInSearch(driver, "Arts and Design")
+
+    driver.execute_script("document.body.style.zoom='60%'")
+    
     #selectCompaniesInSearch(driver, companies)
-    page_num = getSearchResultPageNumber(driver)
+    page_num = getNumOfSearchResultPages(driver)
     print("You are now ready to move on to working with " + str(page_num) + " pages.")
     #test(driver, "https://www.google.com.au")
     results_num = getSearchResultsNumber(driver)
     print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
 
-    height = driver.execute_script("return document.documentElement.scrollHeight")
-    firstQuarter = height/4
-    halfway = height/2
-    lastQuarter = firstQuarter + halfway
-    
-    driver.execute_script("window.scrollTo(0, " + str(firstQuarter) + ");")
-    time.sleep(1)
-    driver.execute_script("window.scrollTo(0, " + str(halfway) + ");")
-    time.sleep(1)
-    driver.execute_script("window.scrollTo(0, " + str(lastQuarter) + ");")
-    time.sleep(1)
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(1)
-    
-    curr = 1
-    while curr <= results_num:
-        openSearchResults(driver, curr)
-        curr+=1
-
+    iterateThroughPages(driver)
     
     time.sleep(6)
     driver.quit()
@@ -81,6 +69,32 @@ def startEmptySearchInSalesNav(driver):
     finally:
         search_bar = driver.find_element_by_id('global-typeahead-search-input');
         search_bar.send_keys(Keys.RETURN)
+        
+
+def selectFunctionInSearch(driver, category):
+
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]')))
+    except:
+        driver.quit()
+    finally:
+        function = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]')
+        function.click()
+
+        function_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/input')
+        function_search_bar.send_keys(category)
+        function_search_bar.send_keys(Keys.RETURN)
+
+
+    try:
+        wait = WebDriverWait(driver, 1)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')))
+    except:
+        driver.quit()
+    finally:
+        function_country_btn = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')
+        function_country_btn.send_keys(Keys.RETURN)
 
 
 def selectGeographyInSearch(driver, country):
@@ -158,7 +172,7 @@ def selectCompaniesInSearch(driver, companies):
             filter_search_bar.send_keys(company)
             filter_search_bar.send_keys(Keys.RETURN)
 
-def getSearchResultPageNumber(driver):
+def getNumOfSearchResultPages(driver):
 # I want to know the number of pages of search results
     try:
         wait = WebDriverWait(driver, 10)
@@ -197,19 +211,26 @@ def openSearchResults(driver, curr):
         test(driver, url)
 
 def grabDetails(driver):
+
+    driver.execute_script("document.body.style.zoom='60%'")
+
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH, '//div[@class="container"]/div/div/div/div/dl/dt/span')))
-    except:
-        driver.quit()
-    finally:
+        #elem1 = wait.until(EC.presence_of_element_located((By.XPATH, '//div[@class="container"]/div/div/div/div/dl/dt/span')))
+        elem1 = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt')))
         fullname = driver.find_element(By.XPATH, '//div[@class="container"]/div/div/div/div/dl/dt/span').text
-        position = driver.find_element(By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt').text
         location = driver.find_element(By.XPATH, '//div[@class="container"]/div/div/div/div/dl/dd[@class="mt4 mb0"]/div').text
+        position = driver.find_element(By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt').text
         print("Fullname : " + fullname)
-        print("Position : " + position)
         print("Location : " + location)
-                             
+        print("Position : " + position) 
+    except StaleElementReferenceException as Exception:
+        print('StaleElementReferenceException while trying to type password, trying to find element again')
+        wait = WebDriverWait(driver, 10)
+        elem2 = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt')))
+        position = driver.find_element(By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt')
+        print("Position : " + position) 
+               
     
 
 def test(driver, url):
@@ -217,10 +238,64 @@ def test(driver, url):
     driver.switch_to.window(driver.window_handles[1])
     driver.get(url);
     grabDetails(driver)
-    time.sleep(3)
+    time.sleep(2)
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
     
 
+def iterateThroughResults(driver):
+    results_num = getSearchResultsNumber(driver)
+    scrollDown(driver)
+    
+    curr = 1
+    while curr <= results_num:
+        openSearchResults(driver, curr)
+        curr+=1
+
+def scrollDown(driver):
+    
+    height = driver.execute_script("return document.documentElement.scrollHeight")
+
+    #Divide the scroll height into 6 equal sections so driver can stop at each section.
+    sect1 = height/6
+    sect2 = sect1 * 2
+    sect3 = sect1 * 3
+    sect4 = sect1 * 4
+    sect5 = sect1 * 5
+
+    #Stop at each sections ending with the bottom of the page. Make sure all results load on the page.    
+    driver.execute_script("window.scrollTo(0, " + str(sect1) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, " + str(sect2) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, " + str(sect3) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, " + str(sect4) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, " + str(sect5) + ");")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, " + str(height) + ");")
+    time.sleep(1)
+    
+
+
+def iterateThroughPages(driver):
+    
+    page_num = getNumOfSearchResultPages(driver)
+    curr = 1
+
+    iterateThroughResults(driver)
+
+    while curr < page_num:
+        curr+=1
+
+        try:
+            wait = WebDriverWait(driver, 10)
+            element = wait.until(EC.presence_of_element_located((By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]')))
+        finally:
+            nextPage = driver.find_element(By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]/li['+ str(curr) + ']/button')
+            nextPage.send_keys(Keys.RETURN)
+            time.sleep(2)
+            iterateThroughResults(driver)
 
 main()
