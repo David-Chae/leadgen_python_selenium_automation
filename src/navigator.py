@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
 import time
 
 
@@ -31,6 +32,7 @@ def main():
     print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
 
     iterateThroughPages(driver)
+    print("All results have been printed.")
     
     time.sleep(6)
     driver.quit()
@@ -224,12 +226,9 @@ def grabDetails(driver):
         print("Fullname : " + fullname)
         print("Location : " + location)
         print("Position : " + position) 
-    except StaleElementReferenceException as Exception:
-        print('StaleElementReferenceException while trying to type password, trying to find element again')
-        wait = WebDriverWait(driver, 10)
-        elem2 = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt')))
-        position = driver.find_element(By.XPATH, '//section[@id="profile-positions"]/div/ul/li[1]/dl/dt')
-        print("Position : " + position) 
+    except StaleElementReferenceException:
+        driver.refresh()
+        grabDetails(driver)
                
     
 
@@ -297,5 +296,6 @@ def iterateThroughPages(driver):
             nextPage.send_keys(Keys.RETURN)
             time.sleep(2)
             iterateThroughResults(driver)
+
 
 main()
