@@ -88,39 +88,37 @@ def test_search():
     driver = webdriver.Chrome()
 
     #Log into Linkedin Sales Navigator.
-    loginToLinkedInSalesNav(driver)
+    log_into_linked_in_sales_nav(driver)
 
     #Open an empty search page in Sales Navigator    
-    startEmptySearchInSalesNav(driver)
+    start_empty_search_in_sales_nav(driver)
 
-    #Select Australia as geographical location of the leads.
-    searchGeographyInSearch(driver, "Australia")
+    #Search and then select Australia as geographical location of the leads.
+    search_geography_in_search(driver, "Australia")
+    select_geography_in_search(driver)
 
     #Select Chief Marketing Officer as a title in search.
-    selectTitleInSearch(driver, 'Chief Marketing Officer')
+    select_title_in_search(driver, 'Chief Marketing Officer')
 
     #Select Arts and Design as function in search.
-    selectFunctionInSearch(driver, "Arts and Design")
+    select_function_in_search(driver, "Arts and Design")
     
     #Zoom the browser to 60%.
     driver.execute_script("document.body.style.zoom='60%'")
 
     #Following line of code has been commented out because the Linkedin returns too many request message.
-    #selectCompaniesInSearch(driver, companies)
+    #select_companies_in_search(driver, companies)
 
     #Get the number of pages in the search results.
-    page_num = getNumOfSearchResultPages(driver)
+    page_num = get_num_of_search_result_pages(driver)
     print("You are now ready to move on to working with " + str(page_num) + " pages.")
-
-    #Following line of code has been commented out because test function has been refactored.
-    #test(driver, "https://www.google.com.au")
     
     #Get the number of search results in the current page.
-    results_num = getSearchResultsNumber(driver)
+    results_num = get_num_of_search_results_in_current_page(driver)
     print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
 
     #Open each results in the search results and copy details into an object. Move to next page if necessary.
-    iterateThroughPages(driver)
+    iterate_through_pages(driver)
     print("All results have been printed.")
 
     #Write the copied details into an excel file.
@@ -142,10 +140,10 @@ def try_lusha():
     driver = webdriver.Chrome(chrome_options=options)
 
     #Log into Linkedin Sales Navigator.
-    loginToLinkedInSalesNav(driver)
+    log_into_linked_in_sales_nav(driver)
 
     #Log into Lusha then closes the browser tab.
-    loginToLusha(driver)
+    log_into_lusha(driver)
 
     #Wait until driver moves to far left first tab.
     time.sleep(2)
@@ -161,7 +159,7 @@ def try_lusha():
     agree_to_lusha_privacy_policy(driver)
     time.sleep(1)
 
-    #Get a Linkein account profile.
+    #Get a Linkedin account profile.
     driver.get("https://www.linkedin.com/in/john-m-b44ab3108/")
     time.sleep(2)
     
@@ -178,8 +176,8 @@ def try_lusha():
         print(e)
 
 
-#This function is still in progress, Still needs more code so it log into Lusha.
-def loginToLusha(driver):
+#This function is still in progress. The Lusha handles Bot by asking user to select images.
+def log_into_lusha(driver):
 
     driver.switch_to.window(driver.window_handles[1])
     driver.get("https://auth.lusha.com/login")
@@ -207,13 +205,13 @@ def loginToLusha(driver):
         
     except StaleElementReferenceException:
         driver.refresh()
-        loginToLusha(driver)
+        log_into_lusha(driver)
 
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
 
 
-def loginToLinkedInSalesNav(driver):    
+def log_into_linked_in_sales_nav(driver):    
     
     driver.get("https://www.linkedin.com")
 
@@ -238,10 +236,10 @@ def loginToLinkedInSalesNav(driver):
         
     except StaleElementReferenceException:
         driver.refresh()
-        loginToLinkedInSalesNav(driver)
+        log_into_linked_in_sales_nav(driver)
 
 
-def startEmptySearchInSalesNav(driver):
+def start_empty_search_in_sales_nav(driver):
     
     try:
         wait = WebDriverWait(driver, 10)
@@ -252,10 +250,10 @@ def startEmptySearchInSalesNav(driver):
 
     except StaleElementReferenceException:
         driver.refresh()
-        startEmptySearchInSalesNav(driver)
+        start_empty_search_in_sales_nav(driver)
         
 
-def selectFunctionInSearch(driver, category):
+def select_function_in_search(driver, category):
 
     try:
         wait = WebDriverWait(driver, 10)
@@ -269,7 +267,7 @@ def selectFunctionInSearch(driver, category):
         function_search_bar.send_keys(Keys.RETURN)
     except StaleElementReferenceException:
         driver.refresh()
-        selectFunctionInSearch(driver, category)
+        select_function_in_search(driver, category)
 
 
     try:
@@ -281,28 +279,26 @@ def selectFunctionInSearch(driver, category):
 
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        selectFunctionInSearch(driver, category)
+        select_function_in_search(driver, category)
 
 
-def searchGeographyInSearch(driver, country):
+def search_geography_in_search(driver, country):
 
     try:
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[5]')))
-    
         geography = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[5]')
         geography.click()
         geography_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[5]//div[@class="ph4 pb4"]/input')
         geography_search_bar.send_keys(country)
         geography_search_bar.send_keys(Keys.RETURN)
-        selectGeographyInSearch(driver)
         
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        searchGeographyInSearch(driver, country)
+        search_geography_in_search(driver, country)
 
 
-def selectGeographyInSearch(driver):    
+def select_geography_in_search(driver):    
     try:
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[5]//div[@class="ph4 pb4"]/ol/li[1]/button')))
@@ -312,10 +308,10 @@ def selectGeographyInSearch(driver):
 
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        selectGeographyInSearch(driver, country)
+        select_geography_in_search(driver, country)
 
 
-def selectTitleInSearch(driver, title):
+def select_title_in_search(driver, title):
     
     try:
         wait = WebDriverWait(driver, 10)
@@ -328,10 +324,11 @@ def selectTitleInSearch(driver, title):
         filter_search_bar.send_keys(title)
         filter_search_bar.send_keys(Keys.RETURN)
     except (StaleElementReferenceException , TimeoutException):
+        select_title_in_search(driver, title)
         driver.refresh()
         
 
-def selectTitlesInSearch(driver, titles):
+def select_titles_in_search(driver, titles):
     
     try:
         wait = WebDriverWait(driver, 10)
@@ -346,10 +343,10 @@ def selectTitlesInSearch(driver, titles):
             filter_search_bar.send_keys(Keys.RETURN)
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        selectTitlesInSearch(driver, titles)
+        select_titles_in_search(driver, titles)
 
 
-def selectCompaniesInSearch(driver, companies):
+def select_companies_in_search(driver, companies):
     
     try:
         wait = WebDriverWait(driver, 10)
@@ -364,9 +361,9 @@ def selectCompaniesInSearch(driver, companies):
             filter_search_bar.send_keys(Keys.RETURN)
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        selectCompaniesInSearch(driver, companies)
+        select_companies_in_search(driver, companies)
 
-def getNumOfSearchResultPages(driver):
+def get_num_of_search_result_pages(driver):
 # I want to know the number of pages of search results
     try:
         wait = WebDriverWait(driver, 10)
@@ -379,11 +376,11 @@ def getNumOfSearchResultPages(driver):
         
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        getNumOfSearchResultPages(driver)
+        get_num_of_search_result_pages(driver)
 
     return page_num
 
-def getSearchResultsNumber(driver):
+def get_num_of_search_results_in_current_page(driver):
     try:
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]')))
@@ -392,17 +389,17 @@ def getSearchResultsNumber(driver):
         print("There are " + str(results_num) + " results in current page.")
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        getSearchResultsNumber(driver)
+        get_num_of_search_results_in_current_page(driver)
         
     return results_num
     
 
-def iterateThroughPages(driver):
+def iterate_through_pages(driver):
     
-    page_num = getNumOfSearchResultPages(driver)
+    page_num = get_num_of_search_result_pages(driver)
     curr = 1
 
-    iterateThroughResults(driver)
+    iterate_through_results(driver)
 
     while curr < page_num:
         curr+=1
@@ -414,22 +411,22 @@ def iterateThroughPages(driver):
             nextPage = driver.find_element(By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]/li['+ str(curr) + ']/button')
             nextPage.send_keys(Keys.RETURN)
             time.sleep(2)
-            iterateThroughResults(driver)
+            iterate_through_results(driver)
         except (StaleElementReferenceException , TimeoutException):
             curr-=1
 
 
-def iterateThroughResults(driver):
-    results_num = getSearchResultsNumber(driver)
-    scrollDown(driver)
+def iterate_through_results(driver):
+    results_num = get_num_of_search_results_in_current_page(driver)
+    scroll_down(driver)
     
     curr = 1
     while curr <= results_num:
-        openSearchResults(driver, curr)
+        open_search_results(driver, curr)
         curr+=1
 
 
-def openSearchResults(driver, curr):
+def open_search_results(driver, curr):
     try:
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]/li['+ str(curr) + ']/div[2]/div/div/div/article/section[@class="result-lockup"]/div/div/dl/dt[@class="result-lockup__name"]/a')))
@@ -439,7 +436,7 @@ def openSearchResults(driver, curr):
         driver.switch_to.window(driver.window_handles[1])
         driver.get(url);
         
-        grabDetails(driver)
+        grab_details(driver)
 
         time.sleep(2)
         driver.close()
@@ -447,10 +444,10 @@ def openSearchResults(driver, curr):
         
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        openSearchResults(driver, curr)
+        open_search_results(driver, curr)
 
 
-def grabDetails(driver):
+def grab_details(driver):
 
     driver.execute_script("document.body.style.zoom='60%'")
 
@@ -480,7 +477,7 @@ def grabDetails(driver):
 
     except StaleElementReferenceException:
         driver.refresh()
-        grabDetails(driver)
+        grab_details(driver)
 
 
 
@@ -583,7 +580,7 @@ def check_lusha_show_btn(driver):
     return False
     
 
-def scrollDown(driver):
+def scroll_down(driver):
     
     height = driver.execute_script("return document.documentElement.scrollHeight")
 
@@ -637,9 +634,3 @@ def write_leads_to_excel_file(file_name, sheet_name):
     workbook.close()
 
 main()
-
-
-
-
-
-
