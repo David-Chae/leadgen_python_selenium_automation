@@ -9,6 +9,8 @@ from nameparser import HumanName
 import xlsxwriter
 import time
 import re, string
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
 
 
 titles = ('Chief Marketing Officer')
@@ -59,36 +61,156 @@ class Profile:
         name = HumanName(self.get_full_name(fullname))
         return name.last
 
-        
+
+class Lusha:
     
+    def __init__(self, email, mobile):
+        self._email = email
+        self._mobile = mobile
+
+    def get_email(self):
+        return self._email
+    
+    def get_mobile(self):
+        return self._mobile
+
 
 def main():
+    #try_lusha()
+    test_search()
+    
+    
+
+def test_search():
+    #Take record of time that this program started running.
+    start_time = time.time()
 
     driver = webdriver.Chrome()
-    
-    loginToLinkedInSalesNav(driver)
-    startEmptySearchInSalesNav(driver)
-    searchGeographyInSearch(driver, "Australia")
-    selectTitleInSearch(driver, 'Chief Marketing Officer')
-    selectFunctionInSearch(driver, "Arts and Design")
 
-    driver.execute_script("document.body.style.zoom='60%'")
+    #Log into Linkedin Sales Navigator.
+    loginToLinkedInSalesNav(driver)
+
+    #Open an empty search page in Sales Navigator    
+    startEmptySearchInSalesNav(driver)
+
+    #Select Australia as geographical location of the leads.
+    searchGeographyInSearch(driver, "Australia")
+
+    #Select Chief Marketing Officer as a title in search.
+    selectTitleInSearch(driver, 'Chief Marketing Officer')
+
+    #Select Arts and Design as function in search.
+    selectFunctionInSearch(driver, "Arts and Design")
     
+    #Zoom the browser to 60%.
+    driver.execute_script("document.body.style.zoom='60%'")
+
+    #Following line of code has been commented out because the Linkedin returns too many request message.
     #selectCompaniesInSearch(driver, companies)
+
+    #Get the number of pages in the search results.
     page_num = getNumOfSearchResultPages(driver)
     print("You are now ready to move on to working with " + str(page_num) + " pages.")
+
+    #Following line of code has been commented out because test function has been refactored.
     #test(driver, "https://www.google.com.au")
+    
+    #Get the number of search results in the current page.
     results_num = getSearchResultsNumber(driver)
     print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
 
+    #Open each results in the search results and copy details into an object. Move to next page if necessary.
     iterateThroughPages(driver)
     print("All results have been printed.")
 
+    #Write the copied details into an excel file.
     write_leads_to_excel_file("leads.xlsx", "Australia_CMO_Arts_N_Design")
     print("All leads data have been written to xlsx file.")
     
     time.sleep(6)
     driver.quit()
+
+    print("---This program took %s seconds ---" % (time.time() - start_time))    
+
+
+def try_lusha():
+    
+    #Load Lusha Extension to driver.
+    extension='E:/python-selenium-code/10.3.2_0.crx'
+    options = webdriver.ChromeOptions()
+    options.add_extension(extension)
+    driver = webdriver.Chrome(chrome_options=options)
+
+    #Log into Linkedin Sales Navigator.
+    loginToLinkedInSalesNav(driver)
+
+    #Log into Lusha then closes the browser tab.
+    loginToLusha(driver)
+
+    #Wait until driver moves to far left first tab.
+    time.sleep(2)
+    #Refresh the tab because it takes refresh to update Lusha login.
+    driver.refresh()
+    #Give enough time for Lusha to appear on Linkedin page.
+    time.sleep(2)
+
+    #Open Lusha extension.
+    open_lusha(driver)
+    time.sleep(1)
+    #Click to agree to Lusha privacy policy
+    agree_to_lusha_privacy_policy(driver)
+    time.sleep(1)
+
+    #Get a Linkein account profile.
+    driver.get("https://www.linkedin.com/in/john-m-b44ab3108/")
+    time.sleep(2)
+    
+    #Open Lusha extension on thia profile.
+    open_lusha(driver)
+    time.sleep(1)
+
+    try:
+        if check_lusha_details_exist(driver):
+            print("Lusha has contact details for this one.")
+        else:
+            print("Lusha has no contact details for this one.")
+    except Exception as e:
+        print(e)
+
+
+#This function is still in progress, Still needs more code so it log into Lusha.
+def loginToLusha(driver):
+
+    driver.switch_to.window(driver.window_handles[1])
+    driver.get("https://auth.lusha.com/login")
+
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, '//div[@id="__next"]/div/div/div/span/form/span[1]/div/input')))
+
+        login_form_id = driver.find_element(By.XPATH, '//div[@id="__next"]/div/div/div/span/form/span[1]/div/input')
+        login_form_pw = driver.find_element(By.XPATH, '//div[@id="__next"]/div/div/div/span/form/span[2]/div/input')
+        login_form_btn = driver.find_element(By.XPATH, '//div[@id="__next"]/div/div/div/span/form/button')
+
+        file_id = open('lusha_id.txt','r')
+        id = file_id.read()
+        file_id.close()
+
+        file_password = open('lusha_password.txt','r')
+        password = file_password.read()
+        file_password.close()
+
+        login_form_id.send_keys(id)
+        login_form_pw.send_keys(password)
+        login_form_btn.send_keys(Keys.RETURN)
+        time.sleep(15)
+        
+    except StaleElementReferenceException:
+        driver.refresh()
+        loginToLusha(driver)
+
+    driver.close()
+    driver.switch_to.window(driver.window_handles[0])
 
 
 def loginToLinkedInSalesNav(driver):    
@@ -113,7 +235,7 @@ def loginToLinkedInSalesNav(driver):
         login_form_btn.send_keys(Keys.RETURN)
 
         driver.get("https://www.linkedin.com/sales/homepage")
-
+        
     except StaleElementReferenceException:
         driver.refresh()
         loginToLinkedInSalesNav(driver)
@@ -265,13 +387,13 @@ def getSearchResultsNumber(driver):
     try:
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]')))
-    except (StaleElementReferenceException , TimeoutException):
-        driver.refresh()
-    finally:
         html_list = driver.find_elements(By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]/li')
         results_num = len(html_list)
         print("There are " + str(results_num) + " results in current page.")
-
+    except (StaleElementReferenceException , TimeoutException):
+        driver.refresh()
+        getSearchResultsNumber(driver)
+        
     return results_num
     
 
@@ -359,6 +481,106 @@ def grabDetails(driver):
     except StaleElementReferenceException:
         driver.refresh()
         grabDetails(driver)
+
+
+
+
+
+def get_lusha():
+
+    #Let's check if the lusha found any details. Did it return details?
+    if check_lusha_could_not_find(driver):
+        #If lusha
+        return Lusha("no email", "no mobile")
+
+    
+    if check_lusha_show_btn(driver):
+        #True means the button needs a click to load the email and phone number.
+        btn = driver.find_element(By.XPATH, '//div[@class="contact-header"]/div/div[@class="contact-action-container"]/div[@class="save-to-action-buttons"]/button')
+        btn.click()
+
+    # I need to implement these functions.
+    #Check if there are any details
+    if check_lusha_details(driver):
+        #Check if there are any email addresses.
+        if check_lusha_email(driver):
+            email = get_lusha_email(driver)
+        #Check if there are any phone numbers.
+        if check_lusha_mobile(driver):
+            mobile = get_lush_mobile(driver)
+            
+
+def agree_to_lusha_privacy_policy(driver):
+
+    try:
+        lusha_frame = driver.find_element_by_id("LU__extension_iframe")
+        driver.switch_to.frame(lusha_frame)
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//div[@class="privacy-approval-buttons-container"]/button')))
+        button = driver.find_element(By.XPATH,'//div[@class="privacy-approval-buttons-container"]/button')
+        ActionChains(driver).move_to_element(button).click(button).perform()
+        driver.switch_to.default_content()
+    except  Exception as e:
+        print(e)
+
+def open_lusha(driver):
+
+    try:
+        wait = WebDriverWait(driver, 10)
+        elem_fullname = wait.until(EC.element_to_be_clickable((By.ID, 'LU__extension_badge_main')))
+        button = driver.find_element(By.ID, 'LU__extension_badge_main')
+        ActionChains(driver).move_to_element(button).click(button).perform()
+        
+    except(StaleElementReferenceException , TimeoutException):
+        driver.refresh()
+        open_lusha(driver)
+
+
+def check_lusha_details_exist(driver):
+
+    #Try and check if the lusha has save contact button.
+    try:
+        lusha_frame = driver.find_element_by_id("LU__extension_iframe")
+        driver.switch_to.frame(lusha_frame)
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//div[@class="save-to-actions-buttons"]/button')))
+        btn = driver.find_element(By.XPATH,'//div[@class="save-to-actions-buttons"]/button')
+        driver.switch_to.default_content()
+        return True        
+    except NoSuchElementException:
+        driver.switch_to.default_content()
+        return False
+    
+    return False
+
+
+
+def check_lusha_details(driver):
+    try:
+        contact_details = driver.find_elements(By.XPATH, '//div[@class="contact-header"]/ul[@class="contact-details"]/li')
+        return True
+    except NoSuchElementException:
+        return False
+
+def check_lusha_could_not_find(driver):
+    try:
+        empty_state = driver.find_element(By.XPATH, '//div[@class="enrich-empty-state-text"]/div[1]')
+        return True
+    except NoSuchElementException:
+        return False
+
+
+def check_lusha_show_btn(driver):
+
+    try:
+        show_contact_btn_text = driver.find_element(By.XPATH, '//div[@class="contact-header"]/div/div[@class="contact-action-container"]/div[@class="save-to-action-buttons"]/button/span').text
+    except NoSuchElementException:
+        return False
+
+    if show_contact_btn_text == "Show contact":
+        return True
+    
+    return False
     
 
 def scrollDown(driver):
@@ -415,3 +637,9 @@ def write_leads_to_excel_file(file_name, sheet_name):
     workbook.close()
 
 main()
+
+
+
+
+
+
