@@ -83,6 +83,8 @@ def test_search():
     #Search and then select Australia as geographical location of the leads.
     search_geography_in_search(driver, "Australia")
     select_geography_in_search(driver)
+    #search_geography_in_search(driver, "New Zealand")
+    #select_geography_in_search(driver)
 
     #Select Chief Marketing Officer as a title in search.
     select_title_in_search(driver, 'Chief Marketing Officer')
@@ -96,9 +98,9 @@ def test_search():
     #Following line of code has been commented out because the Linkedin returns too many request message.
     #select_companies_in_search(driver, companies)
 
-    #Get the number of pages in the search results.
+    #Get the number of pages in the search results. page_num is a string.
     page_num = get_num_of_search_result_pages(driver)
-    print("You are now ready to move on to working with " + str(page_num) + " pages.")
+    print("You are now ready to move on to working with " + page_num + " pages.")
     
     #Get the number of search results in the current page.
     results_num = get_num_of_search_results_in_current_page(driver)
@@ -116,6 +118,10 @@ def test_search():
     driver.quit()
 
     print("---This program took %s seconds ---" % (time.time() - start_time))    
+
+
+
+
 
 
 def log_into_linked_in_sales_nav(driver):    
@@ -276,10 +282,9 @@ def get_num_of_search_result_pages(driver):
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]')))
     
-        html_list = driver.find_element(By.XPATH, '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]')
-        items = html_list.find_elements_by_tag_name("li")
-        page_num = len(items)
-        print("There are " + str(page_num) + " pages")
+        page_num = driver.find_element(By.XPATH, '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]/li[last()]/button').text
+        
+        print("There are " + page_num + " pages")
         
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
@@ -303,7 +308,7 @@ def get_num_of_search_results_in_current_page(driver):
 
 def iterate_through_pages(driver):
     
-    page_num = get_num_of_search_result_pages(driver)
+    page_num = int(get_num_of_search_result_pages(driver))
     curr = 1
 
     iterate_through_results(driver)
@@ -315,12 +320,13 @@ def iterate_through_pages(driver):
             wait = WebDriverWait(driver, 10)
             element = wait.until(EC.presence_of_element_located((By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]')))
         
-            nextPage = driver.find_element(By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]/li['+ str(curr) + ']/button')
+            nextPage = driver.find_element(By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]/li[@class="selected cursor-pointer"]/following-sibling::li/button')
             nextPage.send_keys(Keys.RETURN)
             time.sleep(2)
             iterate_through_results(driver)
         except (StaleElementReferenceException , TimeoutException):
             curr-=1
+            driver.refresh()
 
 
 def iterate_through_results(driver):
