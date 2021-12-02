@@ -86,11 +86,16 @@ def test_search():
     #search_geography_in_search(driver, "New Zealand")
     #select_geography_in_search(driver)
 
+    #Search and then select Australia as geographical location of the leads.
+    search_function_in_search(driver, "information technology")
+    select_function_in_search(driver)
+
+    #Search and then select retail as industry of the leads.
+    #search_industry_in_search(driver, "retail")
+    #select_industry_in_search(driver)
+
     #Select Chief Marketing Officer as a title in search.
     select_title_in_search(driver, 'Chief Marketing Officer')
-
-    #Select Arts and Design as function in search.
-    select_function_in_search(driver, "Arts and Design")
     
     #Zoom the browser to 60%.
     driver.execute_script("document.body.style.zoom='60%'")
@@ -114,7 +119,7 @@ def test_search():
     write_leads_to_excel_file("leads.xlsx", "Australia_CMO_Arts_N_Design")
     print("All leads data have been written to xlsx file.")
     
-    time.sleep(6)
+    time.sleep(10)
     driver.quit()
 
     print("---This program took %s seconds ---" % (time.time() - start_time))    
@@ -195,6 +200,71 @@ def select_function_in_search(driver, category):
         select_function_in_search(driver, category)
 
 
+
+
+def search_industry_in_search(driver, industry):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[8]')))
+        industry_filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[8]')
+        industry_filter.click()
+        industry_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/input')
+        industry_search_bar.send_keys(industry)
+        industry_search_bar.send_keys(Keys.RETURN)
+        
+    except (StaleElementReferenceException , TimeoutException):
+        driver.refresh()
+        search_industry_in_search(driver, industry)
+
+
+def select_industry_in_search(driver):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/ol/li[1]/button')))
+    
+        industry_btn = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/ol/li[1]/button')
+        industry_btn.send_keys(Keys.RETURN)
+
+    except (StaleElementReferenceException , TimeoutException):
+        driver.refresh()
+        select_industry_in_search(driver)
+
+
+
+
+def search_function_in_search(driver, function):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]')))
+        function_filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]')
+        function_filter.click()
+        function_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/input')
+        function_search_bar.send_keys(function)
+        function_search_bar.send_keys(Keys.RETURN)
+        
+    except (StaleElementReferenceException , TimeoutException) as e:
+        driver.refresh()
+        print(e)
+        search_function_in_search(driver, function)
+        
+
+
+def select_function_in_search(driver):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')))
+    
+        function_btn = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')
+        function_btn.send_keys(Keys.RETURN)
+
+    except (StaleElementReferenceException , TimeoutException) as e:
+        driver.refresh()
+        print(e)
+        select_function_in_search(driver)
+
+
+
+
 def search_geography_in_search(driver, country):
 
     try:
@@ -221,7 +291,7 @@ def select_geography_in_search(driver):
 
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
-        select_geography_in_search(driver, country)
+        select_geography_in_search(driver)
 
 
 def select_title_in_search(driver, title):
