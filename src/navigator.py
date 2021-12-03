@@ -80,22 +80,27 @@ def test_search():
     #Open an empty search page in Sales Navigator    
     start_empty_search_in_sales_nav(driver)
 
+    #Select CXO as a seniority level. 
+    select_seniority_in_search(driver, "CXO")
+    select_seniority_in_search(driver, "VP")
+    select_seniority_in_search(driver, "Director")
+
     #Search and then select Australia as geographical location of the leads.
     search_geography_in_search(driver, "Australia")
     select_geography_in_search(driver)
-    #search_geography_in_search(driver, "New Zealand")
-    #select_geography_in_search(driver)
+    search_geography_in_search(driver, "New Zealand")
+    select_geography_in_search(driver)
 
     #Search and then select Australia as geographical location of the leads.
     search_function_in_search(driver, "information technology")
     select_function_in_search(driver)
 
     #Search and then select retail as industry of the leads.
-    #search_industry_in_search(driver, "retail")
-    #select_industry_in_search(driver)
+    search_industry_in_search(driver, "retail")
+    select_industry_in_search(driver)
 
     #Select Chief Marketing Officer as a title in search.
-    select_title_in_search(driver, 'Chief Marketing Officer')
+    #select_title_in_search(driver, 'Chief Marketing Officer')
     
     #Zoom the browser to 60%.
     driver.execute_script("document.body.style.zoom='60%'")
@@ -116,16 +121,13 @@ def test_search():
     print("All results have been printed.")
 
     #Write the copied details into an excel file.
-    write_leads_to_excel_file("leads.xlsx", "Australia_CMO_Arts_N_Design")
+    write_leads_to_excel_file("leads.xlsx", "ANZ_IT_Retail")
     print("All leads data have been written to xlsx file.")
     
     time.sleep(10)
     driver.quit()
 
     print("---This program took %s seconds ---" % (time.time() - start_time))    
-
-
-
 
 
 
@@ -157,6 +159,7 @@ def log_into_linked_in_sales_nav(driver):
         log_into_linked_in_sales_nav(driver)
 
 
+
 def start_empty_search_in_sales_nav(driver):
     
     try:
@@ -170,6 +173,36 @@ def start_empty_search_in_sales_nav(driver):
         driver.refresh()
         start_empty_search_in_sales_nav(driver)
         
+
+
+def select_seniority_in_search(driver, level):
+
+    try:
+        wait = WebDriverWait(driver, 10)
+        # Wait until seniority tab element is found.
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[10]')))
+        # Make seniority variable refer to Seniority level tab element in the Sales Navigator.
+        seniority = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[10]')
+        #Click open the Seniority level tab.
+        seniority.click()
+
+        lv = '"'+level+'"'
+
+        # XPATH must be as follows. The . checks the whole string value of the button element
+        # Explanation is at https://stackoverflow.com/questions/23676537/xpath-for-button-having-text-as-new
+        # '//form[@class="search-filter__form"]/ul/li[10]/div/div/div/ol/li/button[contains(.,' + lv + ' )]'
+        
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[10]/div/div/div/ol/li/button[contains(.,' + lv + ' )]')))
+        # Get seniority list
+        seniority = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[10]/div/div/div/ol/li/button[contains(.,' + lv + ' )]')
+        seniority.click()
+
+    except Exception as e:
+        print(e)
+        driver.quit()
+
+
+
 
 def select_function_in_search(driver, category):
 
