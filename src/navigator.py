@@ -24,6 +24,8 @@ leads = []
 
 page_urls = []
 
+saved_search = "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(id%3A1346013636%2CdoLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A103313686%2Ctext%3ANew%2520South%2520Wales%252C%2520Australia%2CselectionType%3AINCLUDED)))%2C(type%3ACOMPANY_HEADCOUNT%2Cvalues%3AList((id%3AC%2Ctext%3A11-50%2CselectionType%3AINCLUDED)))%2C(type%3ASENIORITY_LEVEL%2Cvalues%3AList((id%3A3%2Ctext%3AEntry%2CselectionType%3AINCLUDED)))%2C(type%3ACOMPANY_HEADQUARTERS%2Cvalues%3AList((id%3A100506852%2Ctext%3AAustralia%2CselectionType%3AINCLUDED)))%2C(type%3AFUNCTION%2Cvalues%3AList((id%3A13%2Ctext%3AInformation%2520Technology%2CselectionType%3AINCLUDED)))))&sessionId=dgQfxmG7RT6qFb2Ku3ouGA%3D%3D"
+
 #Priority group
 saved_search1 = "https://www.linkedin.com/sales/search/people?companyIncluded=Allotrac%3A3575424%2CFulton%2520Market%2520Group%3A13461093%2CBoard%2520International%3A98246%2CServigistics%252C%2520a%2520PTC%2520Technology%3A13667%2CToolsGroup%3A32403%2CBodd%3A10701494&companyTimeScope=CURRENT&doFetchHeroCard=false&geoIncluded=101452733&logHistory=true&rsLogId=1322162068&searchSessionId=%2BmOR94sNQLCUtV5SZ8wFtw%3D%3D&seniorityIncluded=6%2C8%2C7"
 
@@ -92,19 +94,19 @@ def test_search():
     log_into_linked_in_sales_nav(driver)
 
     #Open an empty search page in Sales Navigator    
-    start_empty_search_in_sales_nav(driver)
+    #start_empty_search_in_sales_nav(driver)
 
     #Following line of code has been commented out because the Linkedin returns too many request message.
-    select_companies_in_search(driver, company_list)
+    #select_companies_in_search(driver, company_list)
 
     #Select CXO as a seniority level. 
-    select_seniority_in_search(driver, "CXO")
+    #select_seniority_in_search(driver, "CXO")
     #select_seniority_in_search(driver, "VP")
     #select_seniority_in_search(driver, "Director")
 
     #Search and then select Australia as geographical location of the leads.
-    search_geography_in_search(driver, "Australia")
-    select_geography_in_search(driver)
+    #search_geography_in_search(driver, "Australia")
+    #select_geography_in_search(driver)
     #search_geography_in_search(driver, "New Zealand")
     #select_geography_in_search(driver)
 
@@ -120,7 +122,7 @@ def test_search():
     #select_title_in_search(driver, 'managing director')
     #select_title_in_search(driver, 'general manager')
 
-    #driver.get(saved_search1)
+    driver.get(saved_search)
     
     
     #Zoom the browser to 60%.
@@ -141,6 +143,7 @@ def test_search():
 
     #Close the browser and its process to prevent out of memory issue.
     driver.quit()
+    
 
     #Open each page in the search one by one. 
     for url in page_urls:
@@ -150,7 +153,7 @@ def test_search():
     print("All results have been printed.")
 
     #Write the copied details into an excel file.
-    write_leads_to_excel_file("test_new.xlsx", "test")
+    write_leads_to_excel_file("supply.xlsx", "directors")
     print("All leads data have been written to xlsx file.")
     
     time.sleep(5)
@@ -455,8 +458,6 @@ def get_num_of_search_results_in_current_page(driver):
         get_num_of_search_results_in_current_page(driver)
         
     return results_num
-
-
 
 
 def iterate_through_pages(driver):
