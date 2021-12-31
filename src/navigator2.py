@@ -78,18 +78,147 @@ def test_search():
     start_empty_search_in_sales_nav(driver)
   
     driver.get(saved_search)
+
+    #Expand and collapse functions work.
+    #expand_collapse_filters(driver)
+    #time.sleep(2)
+    #expand_collapse_filters(driver)
     
     #Zoom the browser to 60%.
-    driver.execute_script("document.body.style.zoom='60%'")
+    #driver.execute_script("document.body.style.zoom='60%'")
 
-    scroll_down(driver)
+    #scroll_down(driver)
 
-    time.sleep(5)
+    #Get the number of pages in the search results. page_num is a string.
+    #page_num = get_num_of_search_result_pages(driver)
+    #print("You are now ready to move on to working with " + page_num + " pages.")
+
+    #Get the number of search results in the current page.
+    #results_num = get_num_of_search_results_in_current_page(driver)
+    #print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
+
+    #Open each pages in the search. Append all page urls to page_urls list. 
+    #iterate_through_pages(driver, int(page_num))
 
     #Close the browser and its process to prevent out of memory issue.
-    driver.quit()
+    #driver.quit()
+
+    #Open each page in the search one by one. 
+    #for url in page_urls:
+        #Open all results in current url one by one. Grab details and append it to leads list.
+    #    temp_search(url)
+
+    #print("All results have been printed.")
+
+    #Write the copied details into an excel file.
+    #write_leads_to_excel_file("update_test.xlsx", "CISO")
+    #print("All leads data have been written to xlsx file.")
+    
+    time.sleep(2)
 
     print("---This program took %s seconds ---" % (time.time() - start_time))  
+
+
+def temp_search(url):
+
+    #Make a temporary browser.
+    temp_driver = webdriver.Chrome()
+
+    #Log into Linkedin Sales Navigator.
+    log_into_linked_in_sales_nav(temp_driver)
+
+    #Bring current page
+    temp_driver.get(url)
+    
+    #Go through all the search results in this page.
+    iterate_through_results(temp_driver)
+    #Close the browser and its process in the background.
+    temp_driver.quit()
+
+
+def iterate_through_results(driver):
+    results_num = get_num_of_search_results_in_current_page(driver)
+    scroll_down(driver)
+    
+    curr = 1
+    while curr <= results_num:
+        element = driver.find_element_by_xpath('//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + str(curr) + ']')
+        driver.execute_script("return arguments[0].scrollIntoView();", element)
+        get_profile_data_from_search_result(driver, curr)
+        curr+=1
+
+# I want to go through the results in the page and print one by one on console.
+# This function assumes that the driver is currently at a sales navigator page with results showing from search.
+# For each result, this function grab profile data: full name, first name, last name, location, position, company and url of LinkedIn profile.
+# This populates leads list variable so it can be written to an excel file.
+def get_profile_data_from_search_result(driver, pointer):
+    
+    #Get the number of results in the current page.
+    results_num = get_num_of_search_results_in_current_page(driver)
+
+    #Initialise this WebDriverWait instance so I can use in the loop below.
+    wait = WebDriverWait(driver, 3)
+
+    #Use string of pointer for XPATH
+    pointer_str = str(pointer)
+    
+    try:
+        #Wait until full name appears in DOM.
+        elem1 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[1]/a')))
+        #Get the full name.
+        fullname = driver.find_element(By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[1]/a').text
+        url = driver.find_element(By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[1]/a').get_attribute('href')
+
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        fullname = "TimeoutException"
+        url = "TimeoutException"
+        
+    try: 
+        #Wait until position appears in DOM.
+        elem2 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[3]/span[2]')))
+        #Get the position. 
+        job_title = driver.find_element(By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[3]/span[2]').text
+
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        job_title = "TimeoutException"
+        
+    try:                               
+        #Wait until company appears in DOM. 
+        elem3 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[3]/a')))
+        #Get the company. 
+        company = driver.find_element(By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[3]/a').text
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        company = "TimeoutException"
+
+    try:       
+        #Wait until location appears in DOM. 
+        elem4 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[4]/span')))
+        #Get the location. 
+        location = driver.find_element(By.XPATH, '//ol[@class="artdeco-list background-color-white _border-search-results_1igybl"]/li[' + pointer_str + ']/div/div/div[2]/div[1]/div[1]/div/div[2]/div[4]/span').text
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        location = "TimeoutException"
+
+    person = Profile(company, fullname, job_title, location, url)
+    leads.append(person)
+
+    print(person._company + "%^&" + person._full_name + "%^&" + person._first_name + "%^&" + person._last_name + "%^&" + person._location + "%^&" + person._job_title + "%^&" + person._url)
+    print("  ")
 
 
 #This function opens a browser and logs into Linkedin.
@@ -171,6 +300,59 @@ def scroll_down(driver):
 
     time.sleep(1)
     
+def get_num_of_search_result_pages(driver):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, '//main[@id="content-main"]/div/div[2]/div[2]/div/div[4]/div/ul')))
+        
+        page_num = driver.find_element(By.XPATH, '//main[@id="content-main"]/div/div[2]/div[2]/div/div[4]/div/ul/li[last()]/button').text
+        
+    except NoSuchElementException:
+        print("There is 1 page.")
+        return "1"
+        
+    except (StaleElementReferenceException , TimeoutException):
+        driver.refresh()
+        get_num_of_search_result_pages(driver)
+
+    return page_num
+
+
+def get_num_of_search_results_in_current_page(driver):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, '//main[@id="content-main"]/div/div[2]/div[2]/div/ol')))
+        html_list = driver.find_elements(By.XPATH, '//main[@id="content-main"]/div/div[2]/div[2]/div/ol/li')
+        results_num = len(html_list)
+    except (StaleElementReferenceException , TimeoutException):
+        driver.refresh()
+        get_num_of_search_results_in_current_page(driver)
+        
+    return results_num
+
+
+def iterate_through_pages(driver, page_num):
+    curr = 1
+
+    #Start populating a list of all page urls, starting with current page url.
+    page_urls.append(driver.current_url)
+
+    #iterate_through_results(driver)
+    while curr < page_num:
+        curr+=1
+        
+        try:
+            wait = WebDriverWait(driver, 10)
+            element = wait.until(EC.presence_of_element_located((By.XPATH, '//main[@id="content-main"]/div/div[2]/div[2]/div/div[4]/div/ul[@class="artdeco-pagination__pages artdeco-pagination__pages--number"]')))
+            nextPage = driver.find_element(By.XPATH, '//main[@id="content-main"]/div/div[2]/div[2]/div/div[4]/div/ul/li[@class="artdeco-pagination__indicator artdeco-pagination__indicator--number active selected ember-view"]/following-sibling::li/button')
+            nextPage.send_keys(Keys.RETURN)
+            
+            time.sleep(2)
+            page_urls.append(driver.current_url)
+        except (StaleElementReferenceException , TimeoutException):
+            curr-=1
+            driver.refresh()
+
 
 def write_leads_to_excel_file(file_name, sheet_name):
     # file_name e.g "leads_.xlsx"
@@ -200,8 +382,24 @@ def write_leads_to_excel_file(file_name, sheet_name):
     
     workbook.close()
 
+#Expand the filter if collapsed. If the filters are expanded, collapse the filters.
+def expand_collapse_filters(driver):
+    elem_xpath = '//main[@id="content-main"]/div/div[1]/div[1]/button'
+    click_element_by_xpath(driver, elem_xpath)
+
+
+def click_element_by_xpath(driver, xpath):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+        btn = driver.find_element(By.XPATH, xpath)
+        btn.click()
+
+    except(StaleElementReferenceException , TimeoutException) as e:
+        print(e.message)
+        open_filters(driver)
+
 # The following functions need to be rewritten to adapt to update UI of Sales Navigator
-# def temp_search(url):
 # def select_seniority_in_search(driver, level):
 # def select_function_in_search(driver, category):
 # def search_industry_in_search(driver, industry):
@@ -213,11 +411,6 @@ def write_leads_to_excel_file(file_name, sheet_name):
 # def select_title_in_search(driver, title):
 # def select_titles_in_search(driver, titles):
 # def select_companies_in_search(driver, companies):
-# def get_num_of_search_result_pages(driver):
-# def get_num_of_search_results_in_current_page(driver):
-# def iterate_through_pages(driver):
-# def iterate_through_results(driver):
-# def get_profile_data_from_search_result(driver, pointer):
 # def open_search_results(driver, curr):
 # def grab_details(driver):
 
