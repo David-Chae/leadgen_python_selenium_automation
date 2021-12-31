@@ -77,12 +77,16 @@ def test_search():
     #Open an empty search page in Sales Navigator
     start_empty_search_in_sales_nav(driver)
   
-    driver.get(saved_search)
+    #driver.get(saved_search)
 
     #Expand and collapse functions work.
-    #expand_collapse_filters(driver)
-    #time.sleep(2)
-    #expand_collapse_filters(driver)
+    expand_collapse_filters(driver)
+    time.sleep(2)
+
+    specify_a_lead_function(driver, "information")
+    time.sleep(2)
+
+    expand_collapse_filters(driver)
     
     #Zoom the browser to 60%.
     #driver.execute_script("document.body.style.zoom='60%'")
@@ -387,17 +391,77 @@ def expand_collapse_filters(driver):
     elem_xpath = '//main[@id="content-main"]/div/div[1]/div[1]/button'
     click_element_by_xpath(driver, elem_xpath)
 
+#Opens function filter in Sales Navigator and it types in a function name.
+#Then it select the topmost function that appears from search. Clicks the function element.
+#Then it closes the function filter.
+def specify_a_lead_function(driver, function_name):
+    short_cut_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[1]'
+    open_btn_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[1]/div/button'
+    close_btn_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[1]/div[1]/button'
+    search_bar_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[1]/div[2]/div/div[1]/div/input'
+    results_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[1]/div[2]/div/ul'
 
-def click_element_by_xpath(driver, xpath):
+    click_element_by_xpath(driver, open_btn_xpath)
+
+    #Type the function name in the search bar in function filter.
+    type_in_search_bar_by_xpath(driver, search_bar_xpath, function_name)
+
+    #Wait a second for the results to load from typing.
+    time.sleep(1)
+
+    #Get the number of results
+    res_num = get_number_of_filter_search_results(driver, results_xpath)
+
+    #If search returns only one result, li element does not need to specify [1] else, li need to be li[1] in xpath. 
+    if int(res_num) > 1 :
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[1]/div[2]/div/ul/li[1]/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    elif int(res_num) == 1:
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[1]/div[2]/div/ul/li/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    else :
+        print("No matching result for the function name or it can be a StaleElementReferenceException/TimeoutException.")
+
+    click_element_by_xpath(driver,close_btn_xpath)
+
+
+
+def get_number_of_filter_search_results(driver, results_xpath):
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
-        btn = driver.find_element(By.XPATH, xpath)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, results_xpath)))
+        results_list_element = driver.find_element(By.XPATH, results_xpath)
+        
+        return results_list_element.get_attribute('data-count')
+    except(StaleElementReferenceException , TimeoutException) as e:
+        print(e.message)
+        return "0"
+
+    return "0"
+
+
+def type_in_search_bar_by_xpath(driver, search_bar_xpath, search_keywords):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, search_bar_xpath)))
+        search_bar = driver.find_element(By.XPATH, search_bar_xpath)
+        search_bar.send_keys(search_keywords)
+    except(StaleElementReferenceException , TimeoutException) as e:
+        print(e.message)
+        
+
+
+def click_element_by_xpath(driver, element_xpath):
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, element_xpath)))
+        btn = driver.find_element(By.XPATH, element_xpath)
         btn.click()
 
     except(StaleElementReferenceException , TimeoutException) as e:
         print(e.message)
-        open_filters(driver)
+        
+
 
 # The following functions need to be rewritten to adapt to update UI of Sales Navigator
 # def select_seniority_in_search(driver, level):
