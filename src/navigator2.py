@@ -83,7 +83,7 @@ def test_search():
     expand_collapse_filters(driver)
     time.sleep(2)
 
-    specify_a_lead_function(driver, "information")
+    specify_a_seniority(driver, "CXO")
     time.sleep(2)
 
     expand_collapse_filters(driver)
@@ -391,6 +391,126 @@ def expand_collapse_filters(driver):
     elem_xpath = '//main[@id="content-main"]/div/div[1]/div[1]/button'
     click_element_by_xpath(driver, elem_xpath)
 
+
+def specify_a_seniority(driver, wanted_level):
+    open_btn_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[3]/div/button'
+    close_btn_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[3]/div[1]/button'
+    results_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[3]/div[2]/div/ul'
+
+    #Open the filter for seniority.
+    click_element_by_xpath(driver, open_btn_xpath)
+    time.sleep(1)
+    
+    seniority_list = driver.find_elements(By.XPATH, '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[3]/div[2]/div/ul/li')
+
+    for seniority in seniority_list:
+        seniority_text = seniority.find_element(By.XPATH, './/div/span[1]').text
+        if seniority_text == wanted_level:
+            seniority_include = seniority.find_element(By.XPATH,'.//div/button[1]')
+            seniority_include.click()
+            break
+            
+
+
+def specify_a_company(driver, company):
+    short_cut_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[1]/div/fieldset[1]' 
+    open_btn_xpath =  '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[1]/div/fieldset[1]/div/button'
+    close_btn_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[1]/div/fieldset[1]/div[1]/button'
+    search_bar_xpath ='//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[1]/div/fieldset[1]/div[2]/div/div[1]/div/input'
+    results_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[1]/div/fieldset[1]/div[2]/div/ul'
+    
+    #Open the filter for geography.
+    click_element_by_xpath(driver, open_btn_xpath)
+
+    #Type the location in the search bar in geography filter.
+    type_in_search_bar_by_xpath(driver, search_bar_xpath, company)
+
+    #Wait a second for the results to load from typing.
+    time.sleep(1)
+
+    #Get the number of results
+    res_num = get_number_of_filter_search_results(driver, results_xpath)
+
+    #If search returns only one result, li element does not need to specify [1] else, li need to be li[1] in xpath. 
+    if int(res_num) > 1 :
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[1]/div/fieldset[1]/div[2]/div/ul/li[1]/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    elif int(res_num) == 1:
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[1]/div/fieldset[1]/div[2]/div/ul/li/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    else :
+        print("No matching result for the function name or it can be a StaleElementReferenceException/TimeoutException.")
+
+    click_element_by_xpath(driver,close_btn_xpath)
+
+
+def specify_a_geography(driver, location):
+    short_cut_xpath = '//main[@id="content-main"]/div/div[1]/form/div[2]/fieldset[1]/div/fieldset[3]' 
+    open_btn_xpath = '//main[@id="content-main"]/div/div[1]/form/div[2]/fieldset[1]/div/fieldset[3]/div/button'
+    close_btn_xpath = '//main[@id="content-main"]/div/div[1]/form/div[2]/fieldset[1]/div/fieldset[3]/div[1]/button'
+    search_bar_xpath = '//main[@id="content-main"]/div/div[1]/form/div[2]/fieldset[1]/div/fieldset[3]/div[2]/div/div[1]/div/input'
+    results_xpath = '//main[@id="content-main"]/div/div[1]/form/div[2]/fieldset[1]/div/fieldset[3]/div[2]/div/ul'
+
+    #Open the filter for geography.
+    click_element_by_xpath(driver, open_btn_xpath)
+
+    #Type the location in the search bar in geography filter.
+    type_in_search_bar_by_xpath(driver, search_bar_xpath, location)
+
+    #Wait a second for the results to load from typing.
+    time.sleep(1)
+
+    #Get the number of results
+    res_num = get_number_of_filter_search_results(driver, results_xpath)
+
+    #If search returns only one result, li element does not need to specify [1] else, li need to be li[1] in xpath. 
+    if int(res_num) > 1 :
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[2]/fieldset[1]/div/fieldset[3]/div[2]/div/ul/li[1]/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    elif int(res_num) == 1:
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[2]/fieldset[1]/div/fieldset[3]/div[2]/div/ul/li/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    else :
+        print("No matching result for the function name or it can be a StaleElementReferenceException/TimeoutException.")
+
+    click_element_by_xpath(driver,close_btn_xpath)
+
+
+#Opens job title filter in Sales Navigator and it types in a job title.
+#Then it select the topmost job title that appears from search. Clicks the function element.
+#Then it closes the job title filter.
+def specify_a_lead_job_title(driver, job_title):
+    short_cut_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[2]' 
+    open_btn_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[2]/div/button'
+    close_btn_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[2]/div[1]/button'
+    search_bar_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[2]/div[2]/div/div[1]/div/input'
+    results_xpath = '//main[@id="content-main"]/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[2]/div[2]/div/ul'
+
+    #Open the filter for job title.
+    click_element_by_xpath(driver, open_btn_xpath)
+    
+    #Type the job title in the search bar in job title filter.
+    type_in_search_bar_by_xpath(driver, search_bar_xpath, job_title)
+
+    #Wait a second for the results to load from typing.
+    time.sleep(1)
+
+    #Get the number of results
+    res_num = get_number_of_filter_search_results(driver, results_xpath)
+
+    #If search returns only one result, li element does not need to specify [1] else, li need to be li[1] in xpath. 
+    if int(res_num) > 1 :
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[2]/div[2]/div/ul/li[1]/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    elif int(res_num) == 1:
+        first_result_include_xpath = '/html/body/main/div/div[1]/form/div[1]/fieldset[2]/div/fieldset[2]/div[2]/div/ul/li/div/button[1]'
+        click_element_by_xpath(driver,first_result_include_xpath)
+    else :
+        print("No matching result for the function name or it can be a StaleElementReferenceException/TimeoutException.")
+
+    click_element_by_xpath(driver,close_btn_xpath)
+
+
 #Opens function filter in Sales Navigator and it types in a function name.
 #Then it select the topmost function that appears from search. Clicks the function element.
 #Then it closes the function filter.
@@ -460,21 +580,14 @@ def click_element_by_xpath(driver, element_xpath):
 
     except(StaleElementReferenceException , TimeoutException) as e:
         print(e.message)
-        
 
+    
 
 # The following functions need to be rewritten to adapt to update UI of Sales Navigator
 # def select_seniority_in_search(driver, level):
 # def select_function_in_search(driver, category):
 # def search_industry_in_search(driver, industry):
 # def select_industry_in_search(driver):
-# def search_function_in_search(driver, function):
-# def select_function_in_search(driver):
-# def search_geography_in_search(driver, country):
-# def select_geography_in_search(driver):
-# def select_title_in_search(driver, title):
-# def select_titles_in_search(driver, titles):
-# def select_companies_in_search(driver, companies):
 # def open_search_results(driver, curr):
 # def grab_details(driver):
 
