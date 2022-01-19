@@ -469,8 +469,10 @@ def get_num_of_search_results_in_current_page(driver):
         element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]')))
         html_list = driver.find_elements(By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]/li')
         results_num = len(html_list)
-    except (StaleElementReferenceException , TimeoutException):
-        driver.refresh()
+    except StaleElementReferenceException:
+        results_num = 0
+    except TimeoutException:
+        driver.refresh() 
         get_num_of_search_results_in_current_page(driver)
         
     return results_num
@@ -504,12 +506,16 @@ def iterate_through_pages(driver):
 def iterate_through_results(driver):
     results_num = get_num_of_search_results_in_current_page(driver)
     scroll_down(driver)
-    
-    curr = 1
-    while curr <= results_num:
-        #open_search_results(driver, curr)
-        get_profile_data_from_search_result(driver, curr)
-        curr+=1
+
+    if results_num > 0:
+        curr = 1
+        while curr <= results_num:
+            #open_search_results(driver, curr)
+            get_profile_data_from_search_result(driver, curr)
+            curr+=1
+    else:
+        #Do nothing.
+        curr = 0
 
 
 # I want to go through the results in the page and print one by one on console.
