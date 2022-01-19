@@ -428,6 +428,22 @@ def select_companies_in_search(driver, companies):
         driver.refresh()
         select_companies_in_search(driver, companies)
 
+def select_a_company_in_search(driver, company):    
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[7]')))
+    
+        filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[7]')
+        filter.click()
+
+        filter_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[7]//div[@class="ph4 pb4"]/input')
+        filter_search_bar.send_keys(company)
+        filter_search_bar.send_keys(Keys.RETURN)
+    except (StaleElementReferenceException , TimeoutException):
+        driver.refresh()
+        select_companies_in_search(driver, companies)
+
+        
 def get_num_of_search_result_pages(driver):
 # I want to know the number of pages of search results   
 
