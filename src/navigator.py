@@ -13,32 +13,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 
 
-titles = ('Chief Marketing Officer')
-
-#companies = ('Allotrac', 'Fulton Market Group', 'Board International', 'Servigistics, a PTC Technology', 'ToolsGroup', 'Bodd','Department of Transport', 'Colliers', 'Caltex Australia', 'Findex', 'BHD Storage Solutions', 'Retailquip Pty Ltd', 'Scanreco Group', 'DriveRisk (Pty) Ltd', 'TransVirtual', 'Teletrac Navman New Zealand', 'Merit Manufacturing', 'Kynection','Toowoomba Regional Council', 'Sadleirs', 'Multi-Mover Europe BV', 'Flinders Ports Pty Limited', 'DEAN World Cargo', 'Pathtech Pty Ltd', 'Diverseco', 'MTData', 'PTV Group IMEA', 'Dematic Mobile Automation', 'Dematic', 'Headland Machinery', 'DriveRisk Australasia', 'Transurban', 'Asafe Greece - Inoxtec', 'LOSCAM Group', 'Simoco Wireless Solutions', 'Combilift', 'Australian Border Force', 'PTV Group Asia Pacific', 'Sweepers Australia', 'Gilbarco Veeder-Root', 'PTV Group', 'SSAB','McNaughtans Pty. Ltd.' , 'ToooAir Pty. Ltd.', 'Hard Surface Cleaners - Pressure Cleaning & Soft Washing', 'Gaprie Ltd', 'Damon Technology', 'VISA GLOBAL LOGISTICS NL', 'Cascade Australia', 'eCycle Solutions', 'GoLive Monitoring', 'Precision Automotive Equipment', 'Promata Automotive', 'Direct Mail Corporaton', 'Multi-Mover UK', 'Gilbarco Veeder-Root MEA', 'Blue Jay Solutions', 'EForklift Pty Ltd', 'vWork', 'Protection Experts Australia', 'Tele Radio Group', 'MTDATA LIMITED', 'Easy Wash Australia', 'Supply Chain Logistics Association of Australia (SCLAA)', 'Teletrac Navman', 'MTData LLC', 'MTData NZ', 'Automation Systems & Controls Pty Ltd', 'Lionel Samson Sadleirs Group', 'Peacock Bros.', 'McLardy McShane Insurance Brokers', 'R&R Corporate Health', 'Combilift Depot', 'Conquest Equipment', 'Fischer Plastic Products Pty Ltd', 'Microlise', 'Envirofluid', 'Allotrac', 'ASCI - Australasian Supply Chain Institute','Truckworld.com.au', 'Australian Sweeper Company', 'Teletrac Navman Australia', 'KAB Seating Limited', 'Transficient - representing TK Blue Agency & Global Climate Initiatives in Australia', 'ANL', 'Leopard Systems', 'ULTIMATE LED', 'Goodyear Dunlop Tyres (Australia) Pty Ltd', 'Australia LOAD SMART TRUCKING INC', 'Transport Certification Australia', 'Transurban Group', 'Dematic Retrotech', 'Scaco Pty Ltd', 'Gilbarco Australia Holding Pty Ltd', 'Cincom Systems', 'Sadleirs Transport', 'Cotewell', 'Port of Newcastle', 'National Heavy Vehicle Regulator', 'ASAFE AUSTRALASIA Pty Ltd', 'X-Pak Global', 'Datanet Asia Pacific Pty Ltd', 'Ultimate LED Lights', 'WISTA International', 'WIM Technologies', 'ANC Distribution', 'Tele Radio Group Australia', 'Colliers Engineering Design', 'AI Drive By GoLive Monitoring', 'KBS, a Premier Tech Company', 'Netstar Australia', 'TriTech Lubricants Australasia', 'ANC Distribution Australia Pty Ltd', 'Eonmetall Official', 'Muscat Trailers', 'Combilift Australia', 'Bustle Tech', 'M2MONEY ONLINE SERVICE', 'Yarno', 'Gilbarco Veeder Root SEA', 'Infocomm Pty Ltd', 'AUSTRALIAN SWEEPER CORPORATION PTY LTD', 'Nilfisk', 'Bailey Ladders', 'Global GPS Tracking', 'GILBARCO')
-company_list = ['Servigistics, a PTC Technology', 'VNet', 'Thinxtra, The IoT Telco', 'enVista', 'Board International', 'Dematic', 'Dematic Mobile Automation', 'Dematic Retrotech', 'Aera Technology', 'Anaplan', 'Basware', 'Basware Benelux', 'BCR Australia Pty Ltd', 'Blue Yonder', 'Bluejay Solutions', 'BlueJay Web Solutions', 'Coupa Software', 'Coupa Japan', 'Coupa Supply Chain, powered by LLamasoft', 'Coupa Suppliers', 'Descartes Systems Group', 'Descartes Systems Group France', 'Descartes Systems Group Benelux', 'Disprax ERP Software Australia', 'E2open', 'EPG Ehrhardt Partner Group', 'topsystem GmbH (Member of EPG)', 'Epicor Software', 'Garvis', 'GEP Worldwide', 'GEP APAC', 'Körber', 'Körber Supply Chain', 'Körber Supply Chain APAC', 'IBM', 'Icron | An Analog Devices Brand', 'IFS', 'Infocomm Pty Ltd', 'Infor', 'infor global solutions', 'Insight', 'Ivalua', 'JAGGAER', 'JDA Software', 'JLL', 'JLL Asia Pacific', 'Kinaxis', 'Lexian Solutions', 'Logility', 'Manhattan Associates', 'Optimity', 'Optimity Software', 'NetSuite', 'project44', 'SAP', 'SAP Customer Experience', 'SoftwareONE', 'SoftwareONE Australia', 'Sonatype', 'TMC, a division of C.H. Robinson', '| uTenant. | The Warehousing Matchmaker', 'V Net Solutions', 'WiseTech Global']
-
-
+titles =[]
+industry = []
+companies = []
+geographies = []
 
 leads = []
-
 page_urls = []
-
-saved_search = "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(id%3A1346013636%2CdoLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A103313686%2Ctext%3ANew%2520South%2520Wales%252C%2520Australia%2CselectionType%3AINCLUDED)))%2C(type%3ACOMPANY_HEADCOUNT%2Cvalues%3AList((id%3AC%2Ctext%3A11-50%2CselectionType%3AINCLUDED)))%2C(type%3ASENIORITY_LEVEL%2Cvalues%3AList((id%3A3%2Ctext%3AEntry%2CselectionType%3AINCLUDED)))%2C(type%3ACOMPANY_HEADQUARTERS%2Cvalues%3AList((id%3A100506852%2Ctext%3AAustralia%2CselectionType%3AINCLUDED)))%2C(type%3AFUNCTION%2Cvalues%3AList((id%3A13%2Ctext%3AInformation%2520Technology%2CselectionType%3AINCLUDED)))))&sessionId=dgQfxmG7RT6qFb2Ku3ouGA%3D%3D"
-
-#Priority group
-saved_search1 = "https://www.linkedin.com/sales/search/people?companyIncluded=Allotrac%3A3575424%2CFulton%2520Market%2520Group%3A13461093%2CBoard%2520International%3A98246%2CServigistics%252C%2520a%2520PTC%2520Technology%3A13667%2CToolsGroup%3A32403%2CBodd%3A10701494&companyTimeScope=CURRENT&doFetchHeroCard=false&geoIncluded=101452733&logHistory=true&rsLogId=1322162068&searchSessionId=%2BmOR94sNQLCUtV5SZ8wFtw%3D%3D&seniorityIncluded=6%2C8%2C7"
-
-#marketing top people
-saved_search2 = "https://www.linkedin.com/sales/search/people#companyIncluded=Department%2520of%2520Transport%3A349778%2CColliers%3A5227%2CCaltex%2520Australia%3A9965%2CFindex%3A3967749%2CBHD%2520Storage%2520Solutions%3A927862%2CRetailquip%2520Pty%2520Ltd%3A10038173%2CScanreco%2520Group%3A10104011%2CDriveRisk%2520(Pty)%2520Ltd%3A10180765%2CTransVirtual%2520%3A10530800%2CTeletrac%2520Navman%2520%257C%2520New%2520Zealand%3A10691036%2CMerit%2520Manufacturing%3A10701511%2CKynection%3A1070283%2CToowoomba%2520Regional%2520Council%3A1075896%2CSadleirs%3A1086247%2CMulti-Mover%2520Europe%2520BV%3A11009737%2CFlinders%2520Ports%2520Pty%2520Limited%3A1111798%2CDEAN%2520World%2520Cargo%3A1166836%2CPathtech%2520Pty%2520Ltd%3A1171393%2CDiverseco%3A12906515%2CMTData%3A131705%2CPTV%2520Group%2520IMEA%2520%3A13348499%2CDematic%2520Mobile%2520Automation%3A136109%2CDematic%3A14074%2CHeadland%2520Machinery%3A1431001%2CDriveRisk%2520Australasia%3A14397521%2CTransurban%3A14488%2CAsafe%2520Greece%2520-%2520Inoxtec%2520%3A14807739%2CLOSCAM%2520Group%3A1483532%2CSimoco%2520Wireless%2520Solutions%3A148472%2CCombilift%3A1486399%2CAustralian%2520Border%2520Force%3A15309%2CPTV%2520Group%2520Asia%2520Pacific%3A16153489%2CSweepers%2520Australia%3A1629292%2CGilbarco%2520Veeder-Root%3A163991%2CPTV%2520Group%3A165593%2CSSAB%3A166109%2CMcNaughtans%2520Pty.%2520Ltd.%3A18098583%2CToooAir%2520Pty.%2520Ltd.%3A18099392%2CHard%2520Surface%2520Cleaners%2520-%2520Pressure%2520Cleaning%2520%2526%2520Soft%2520Washing%3A18137625%2CGaprie%2520Ltd%3A18313932%2CDamon%2520Technology%3A18349726%2CVISA%2520GLOBAL%2520LOGISTICS%2520NL%3A18459337%2CCascade%2520Australia%3A18534998%2CeCycle%2520Solutions%3A1860791%2CGoLive%2520Monitoring%3A18613723%2CPrecision%2520Automotive%2520Equipment%3A18711214%2CPromata%2520Automotive%3A18758236%2CDirect%2520Mail%2520Corporaton%3A18836595%2CMulti-Mover%2520UK%3A18893256%2CGilbarco%2520Veeder-Root%2520MEA%3A19087182%2CBlue%2520Jay%2520Solutions%3A19121476%2CEForklift%2520Pty%2520Ltd%3A19243240%2CvWork%3A1991796%2CProtection%2520Experts%2520Australia%3A20387540%2CTele%2520Radio%2520Group%3A2083055%2CMTDATA%2520LIMITED%3A21314192%2CEasy%2520Wash%2520Australia%3A22301968%2CSupply%2520Chain%2520%2526%2520Logistics%2520Association%2520of%2520Australia%2520(SCLAA)%3A2399221%2CTeletrac%2520Navman%3A24990%2CMTData%2520LLC%3A2629625%2CMTData%2520NZ%3A2632532%2CAutomation%2520Systems%2520%2526%2520Controls%2520Pty%2520Ltd%3A3066360%2CLionel%2520Samson%2520Sadleirs%2520Group%3A3114048%2CPeacock%2520Bros.%3A3219327%2CMcLardy%2520McShane%2520Insurance%2520Brokers%3A322227%2CR%2526R%2520Corporate%2520Health%3A3276421%2CCombilift%2520Depot%3A3314927%2CConquest%2520Equipment%3A3361929%2CFischer%2520Plastic%2520Products%2520Pty%2520Ltd%3A3364182%2CMicrolise%3A33839%2CEnvirofluid%3A3552049%2CAllotrac%3A3575424%2CASCI%2520-%2520Australasian%2520Supply%2520Chain%2520Institute%3A3682349%2CTruckworld.com.au%3A3692277%2CAustralian%2520Sweeper%2520Company%3A3738673%2CTeletrac%2520Navman%2520%257C%2520Australia%3A3742855%2CKAB%2520Seating%2520Limited%3A4027652%2CTransficient%2520-%2520representing%2520TK'Blue%2520Agency%2520%2526%2520Global%2520Climate%2520Initiatives%2520in%2520Australia%3A42697837%2CANL%3A43609%2CLeopard%2520Systems%3A486727%2CULTIMATE%2520LED%3A48964277%2CGoodyear%2520%2526%2520Dunlop%2520Tyres%2520(Australia)%2520Pty%2520Ltd%2520Australia%3A53770224%2CLOAD%2520SMART%2520TRUCKING%2520INC%3A53829130%2CTransport%2520Certification%2520Australia%3A545896%2CTransurban%2520Group%3A55416951%2CDematic%2520Retrotech%3A56675%2CScaco%2520Pty%2520Ltd%3A58555205%2CGilbarco%2520Australia%2520Holding%2520Pty%2520Ltd%3A58681899%2CCincom%2520Systems%3A6160%2CSadleirs%2520Transport%3A62647764%2CCotewell%3A6423068%2CPort%2520of%2520Newcastle%3A6432433%2CNational%2520Heavy%2520Vehicle%2520Regulator%3A6520823%2CASAFE%2520AUSTRALASIA%2520Pty%2520Ltd%3A6590925%2CX-Pak%2520Global%3A6626434%2CDatanet%2520Asia%2520Pacific%2520Pty%2520Ltd%3A662994%2CUltimate%2520LED%2520Lights%3A67776597%2CWISTA%2520International%2520%3A68796735%2CWIM%2520Technologies%3A69544956%2CANC%2520Distribution%2520%3A71013196%2CTele%2520Radio%2520Group%2520Australia%2520%3A71622572%2CColliers%2520Engineering%2520%2526%2520Design%3A71630305%2CAI%2520Drive%2520By%2520GoLive%2520Monitoring%3A71992449%2CKBS%252C%2520a%2520Premier%2520Tech%2520Company%3A749880%2CNetstar%2520Australia%3A757162%2CTriTech%2520Lubricants%2520Australasia%3A7616600%2CANC%2520Distribution%2520Australia%2520Pty%2520Ltd%3A7670405%2CEonmetall%2520Official%3A77077646%2CMuscat%2520Trailers%3A7750950%2CCombilift%2520Australia%3A7779401%2CBustle%2520Tech%3A7791457%2CM2MONEY%2520ONLINE%2520SERVICE%3A78910980%2CYarno%3A7965238%2CGilbarco%2520Veeder%2520Root%2520SEA%3A79842426%2CInfocomm%2520Pty%2520Ltd%3A8177974%2CAUSTRALIAN%2520SWEEPER%2520CORPORATION%2520PTY%2520LTD%3A8274156%2CNilfisk%3A9029%2CBailey%2520Ladders%3A9125623%2CGlobal%2520GPS%2520Tracking%3A9580664%2CGILBARCO%3A9739658&companyTimeScope=CURRENT&doFetchHeroCard=false&functionIncluded=15&geoIncluded=101452733&logHistory=true&rsLogId=1322161036&searchSessionId=tkTbQPkmTXiU807BqoHmDg%3D%3D&selectedFilter=GE&seniorityIncluded=6%2C7%2C8%2C5"
-
-#MDs and GMs
-saved_search3 = "https://www.linkedin.com/sales/search/people#companyIncluded=Colliers%3A5227%2CCaltex%2520Australia%3A9965%2CMcLardy%2520McShane%2520Insurance%2520Brokers%3A322227%2CNilfisk%3A9029%2CBHD%2520Storage%2520Solutions%3A927862%2CANC%2520Distribution%2520Australia%2520Pty%2520Ltd%3A7670405%2CYarno%3A7965238%2CInfocomm%2520Pty%2520Ltd%3A8177974%2CRetailquip%2520Pty%2520Ltd%3A10038173%2CScanreco%2520Group%3A10104011%2CDriveRisk%2520(Pty)%2520Ltd%3A10180765%2CTransVirtual%2520%3A10530800%2CTeletrac%2520Navman%2520%257C%2520New%2520Zealand%3A10691036%2CMerit%2520Manufacturing%3A10701511%2CKynection%3A1070283%2CToowoomba%2520Regional%2520Council%3A1075896%2CSadleirs%3A1086247%2CMulti-Mover%2520Europe%2520BV%3A11009737%2CFlinders%2520Ports%2520Pty%2520Limited%3A1111798%2CDEAN%2520World%2520Cargo%3A1166836%2CPathtech%2520Pty%2520Ltd%3A1171393%2CDiverseco%3A12906515%2CMTData%3A131705%2CPTV%2520Group%2520IMEA%2520%3A13348499%2CDematic%2520Mobile%2520Automation%3A136109%2CDematic%3A14074%2CHeadland%2520Machinery%3A1431001%2CDriveRisk%2520Australasia%3A14397521%2CTransurban%3A14488%2CAsafe%2520Greece%2520-%2520Inoxtec%2520%3A14807739%2CLOSCAM%2520Group%3A1483532%2CSimoco%2520Wireless%2520Solutions%3A148472%2CCombilift%3A1486399%2CAustralian%2520Border%2520Force%3A15309%2CPTV%2520Group%2520Asia%2520Pacific%3A16153489%2CSweepers%2520Australia%3A1629292%2CGilbarco%2520Veeder-Root%3A163991%2CPTV%2520Group%3A165593%2CSSAB%3A166109%2CMcNaughtans%2520Pty.%2520Ltd.%3A18098583%2CToooAir%2520Pty.%2520Ltd.%3A18099392%2CHard%2520Surface%2520Cleaners%2520-%2520Pressure%2520Cleaning%2520%2526%2520Soft%2520Washing%3A18137625%2CGaprie%2520Ltd%3A18313932%2CDamon%2520Technology%3A18349726%2CVISA%2520GLOBAL%2520LOGISTICS%2520NL%3A18459337%2CCascade%2520Australia%3A18534998%2CeCycle%2520Solutions%3A1860791%2CGoLive%2520Monitoring%3A18613723%2CPrecision%2520Automotive%2520Equipment%3A18711214%2CPromata%2520Automotive%3A18758236%2CDirect%2520Mail%2520Corporaton%3A18836595%2CMulti-Mover%2520UK%3A18893256%2CGilbarco%2520Veeder-Root%2520MEA%3A19087182%2CBlue%2520Jay%2520Solutions%3A19121476%2CEForklift%2520Pty%2520Ltd%3A19243240%2CvWork%3A1991796%2CProtection%2520Experts%2520Australia%3A20387540%2CTele%2520Radio%2520Group%3A2083055%2CMTDATA%2520LIMITED%3A21314192%2CEasy%2520Wash%2520Australia%3A22301968%2CSupply%2520Chain%2520%2526%2520Logistics%2520Association%2520of%2520Australia%2520(SCLAA)%3A2399221%2CTeletrac%2520Navman%3A24990%2CMTData%2520LLC%3A2629625%2CMTData%2520NZ%3A2632532%2CAutomation%2520Systems%2520%2526%2520Controls%2520Pty%2520Ltd%3A3066360%2CLionel%2520Samson%2520Sadleirs%2520Group%3A3114048%2CPeacock%2520Bros.%3A3219327%2CR%2526R%2520Corporate%2520Health%3A3276421%2CCombilift%2520Depot%3A3314927%2CConquest%2520Equipment%3A3361929%2CFischer%2520Plastic%2520Products%2520Pty%2520Ltd%3A3364182%2CMicrolise%3A33839%2CDepartment%2520of%2520Transport%3A349778%2CEnvirofluid%3A3552049%2CAllotrac%3A3575424%2CASCI%2520-%2520Australasian%2520Supply%2520Chain%2520Institute%3A3682349%2CTruckworld.com.au%3A3692277%2CAustralian%2520Sweeper%2520Company%3A3738673%2CTeletrac%2520Navman%2520%257C%2520Australia%3A3742855%2CFindex%3A3967749%2CKAB%2520Seating%2520Limited%3A4027652%2CTransficient%2520-%2520representing%2520TK'Blue%2520Agency%2520%2526%2520Global%2520Climate%2520Initiatives%2520in%2520Australia%3A42697837%2CANL%3A43609%2CLeopard%2520Systems%3A486727%2CULTIMATE%2520LED%3A48964277%2CGoodyear%2520%2526%2520Dunlop%2520Tyres%2520(Australia)%2520Pty%2520Ltd%2520Australia%3A53770224%2CLOAD%2520SMART%2520TRUCKING%2520INC%3A53829130%2CTransport%2520Certification%2520Australia%3A545896%2CTransurban%2520Group%3A55416951%2CDematic%2520Retrotech%3A56675%2CScaco%2520Pty%2520Ltd%3A58555205%2CGilbarco%2520Australia%2520Holding%2520Pty%2520Ltd%3A58681899%2CCincom%2520Systems%3A6160%2CSadleirs%2520Transport%3A62647764%2CCotewell%3A6423068%2CPort%2520of%2520Newcastle%3A6432433%2CNational%2520Heavy%2520Vehicle%2520Regulator%3A6520823%2CASAFE%2520AUSTRALASIA%2520Pty%2520Ltd%3A6590925%2CX-Pak%2520Global%3A6626434%2CDatanet%2520Asia%2520Pacific%2520Pty%2520Ltd%3A662994%2CUltimate%2520LED%2520Lights%3A67776597%2CWISTA%2520International%2520%3A68796735%2CWIM%2520Technologies%3A69544956%2CANC%2520Distribution%2520%3A71013196%2CTele%2520Radio%2520Group%2520Australia%2520%3A71622572%2CColliers%2520Engineering%2520%2526%2520Design%3A71630305%2CAI%2520Drive%2520By%2520GoLive%2520Monitoring%3A71992449%2CKBS%252C%2520a%2520Premier%2520Tech%2520Company%3A749880%2CNetstar%2520Australia%3A757162%2CTriTech%2520Lubricants%2520Australasia%3A7616600%2CEonmetall%2520Official%3A77077646%2CMuscat%2520Trailers%3A7750950%2CCombilift%2520Australia%3A7779401%2CBustle%2520Tech%3A7791457%2CM2MONEY%2520ONLINE%2520SERVICE%3A78910980%2CGilbarco%2520Veeder%2520Root%2520SEA%3A79842426%2CAUSTRALIAN%2520SWEEPER%2520CORPORATION%2520PTY%2520LTD%3A8274156%2CBailey%2520Ladders%3A9125623%2CGlobal%2520GPS%2520Tracking%3A9580664%2CGILBARCO%3A9739658&companyTimeScope=CURRENT&doFetchHeroCard=false&geoIncluded=101452733&logHistory=true&rsLogId=1322161036&searchSessionId=tkTbQPkmTXiU807BqoHmDg%3D%3D&selectedFilter=GE&seniorityIncluded=7%2C6%2C8&titleIncluded=Managing%2520Director%3A16%2CGeneral%2520Manager%3A17&titleTimeScope=CURRENT"
-
-contract_chooser = "https://www.linkedin.com/sales/contract-chooser"
-
-
-
 
 class Profile:
 
@@ -85,33 +66,43 @@ def main():
     
 
 def test_search():
+
+    
     #Take record of time that this program started running.
     start_time = time.time()
 
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome("./chromedriver.exe")
 
     #Log into Linkedin Sales Navigator.
     log_into_linked_in_sales_nav(driver)
 
     #Open an empty search page in Sales Navigator    
-    #start_empty_search_in_sales_nav(driver)
+    start_empty_search_in_sales_nav(driver)
 
     #Following line of code has been commented out because the Linkedin returns too many request message.
     #select_companies_in_search(driver, company_list)
+    company = "Trade Me"
+    select_a_company_in_search(driver, company)
 
     #Select CXO as a seniority level. 
-    #select_seniority_in_search(driver, "CXO")
-    #select_seniority_in_search(driver, "VP")
-    #select_seniority_in_search(driver, "Director")
+    select_seniority_in_search(driver, "CXO")
+    select_seniority_in_search(driver, "VP")
+    select_seniority_in_search(driver, "Director")
+    select_seniority_in_search(driver, "Senior")
+    select_seniority_in_search(driver, "Manager")
 
     #Search and then select Australia as geographical location of the leads.
-    #search_geography_in_search(driver, "Australia")
-    #select_geography_in_search(driver)
-    #search_geography_in_search(driver, "New Zealand")
-    #select_geography_in_search(driver)
+    search_geography_in_search(driver, "Australia")
+    select_geography_in_search(driver)
+    time.sleep(1)
+    search_geography_in_search(driver, "Indonesia")
+    select_geography_in_search(driver)
+    time.sleep(1)
+    search_geography_in_search(driver, "Singapore")
+    select_geography_in_search(driver)
 
     #Search and then select function of the leads.
-    #search_function_in_search(driver, "Marketing")
+    #search_function_in_search(driver, "Information Technology")
     #select_function_in_search(driver)
 
     #Search and then select retail as industry of the leads.
@@ -119,10 +110,10 @@ def test_search():
     #select_industry_in_search(driver)
 
     #Select Chief Marketing Officer as a title in search.
-    #select_title_in_search(driver, 'managing director')
-    #select_title_in_search(driver, 'general manager')
+    #for title in titles:
+    #    select_title_in_search(driver, title)
 
-    driver.get(saved_search)
+    #driver.get("https://www.linkedin.com/sales/search/people?companySize=G%2CH%2CI&doFetchHeroCard=false&geoIncluded=101452733%2C102454443&industryIncluded=43%2C75%2C27%2C68%2C69%2C59%2C116%2C92%2C25%2C148%2C8&logHistory=true&rsLogId=1389016684&searchSessionId=COVLz%2FvhSsiVxYa0WgCntg%3D%3D&titleIncluded=Chief%2520Marketing%2520Officer%3A716%2CChief%2520Information%2520Officer%3A203%2CChief%2520Experience%2520Officer%3A30143%2CHead%2520Of%2520Customer%2520Experience%3A18497%2CChief%2520Digital%2520Officer%3A25884%2CChief%2520Digital%2520Transformation%2520Officer&titleTimeScope=CURRENT")
     
     
     #Zoom the browser to 60%.
@@ -142,18 +133,20 @@ def test_search():
     iterate_through_pages(driver)
 
     #Close the browser and its process to prevent out of memory issue.
-    driver.quit()
+    #driver.quit()
     
-
     #Open each page in the search one by one. 
     for url in page_urls:
-        #Open all results in current url one by one. Grab details and append it to leads list.
-        temp_search(url)
+        #Bring current page
+        driver.get(url)
+        #Go through all the search results in this page.
+        iterate_through_results(driver)
 
     print("All results have been printed.")
 
     #Write the copied details into an excel file.
-    write_leads_to_excel_file("supply.xlsx", "directors")
+    filename = "ByteDance_" + company + ".xlsx"
+    write_leads_to_excel_file(filename, company)
     print("All leads data have been written to xlsx file.")
     
     time.sleep(5)
@@ -179,6 +172,37 @@ def temp_search(url):
     temp_driver.quit()
 
 
+def populate_geographies():
+    with open('geographies.txt') as f:
+        geographies_list = f.readlines()
+        for geo in gepgraphies_list:
+            geo = geo.rstrip("\n")
+            geographies.append(seniority)
+
+def populate_seniorities():
+    with open('seniorities.txt') as f:
+        seniorities_list = f.readlines()
+        for seniority in seniorities_list:
+            seniority = seniority.rstrip("\n")
+            seniorities.append(seniority)
+
+
+def populate_companies():
+    with open('companies.txt') as f:
+        comps = f.readlines()
+        for comp in comps:
+            comp = comp.rstrip("\n")
+            companies.append(comp)
+
+
+def populate_job_titles():
+    with open('jobtitles.txt') as f:
+        jobs = f.readlines()
+        for job in jobs:
+            job = job.rstrip("\n")
+            titles.append(job)
+
+
 
 def log_into_linked_in_sales_nav(driver):    
     
@@ -190,15 +214,15 @@ def log_into_linked_in_sales_nav(driver):
         login_form_btn = driver.find_element_by_class_name("sign-in-form__submit-button")
         
         file_id = open('file_id.txt','r')
-        id = file_id.read()
+        linkedin_id = file_id.read()
         file_id.close()
 
         file_password = open('file_password.txt','r')
-        password = file_password.read()
+        linkedin_password = file_password.read()
         file_password.close()
 
-        login_form_id.send_keys(id)
-        login_form_pw.send_keys(password)
+        login_form_id.send_keys(linkedin_id)
+        login_form_pw.send_keys(linkedin_password)
         login_form_btn.send_keys(Keys.RETURN)
 
         driver.get("https://www.linkedin.com/sales/homepage")
@@ -206,7 +230,6 @@ def log_into_linked_in_sales_nav(driver):
     except StaleElementReferenceException:
         driver.refresh()
         log_into_linked_in_sales_nav(driver)
-
 
 
 def start_empty_search_in_sales_nav(driver):
@@ -278,7 +301,7 @@ def select_function_in_search(driver, category):
         function_country_btn.send_keys(Keys.RETURN)
 
     except (StaleElementReferenceException , TimeoutException):
-        driver.refresh()
+        #driver.refresh()
         select_function_in_search(driver, category)
 
 
@@ -428,7 +451,8 @@ def select_companies_in_search(driver, companies):
         driver.refresh()
         select_companies_in_search(driver, companies)
 
-def select_a_company_in_search(driver, company):    
+def select_a_company_in_search(driver, company):
+    
     try:
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[7]')))
@@ -443,7 +467,6 @@ def select_a_company_in_search(driver, company):
         driver.refresh()
         select_companies_in_search(driver, companies)
 
-        
 def get_num_of_search_result_pages(driver):
 # I want to know the number of pages of search results   
 
@@ -476,6 +499,8 @@ def get_num_of_search_results_in_current_page(driver):
         get_num_of_search_results_in_current_page(driver)
         
     return results_num
+
+
 
 
 def iterate_through_pages(driver):
@@ -514,7 +539,6 @@ def iterate_through_results(driver):
             get_profile_data_from_search_result(driver, curr)
             curr+=1
     else:
-        #Do nothing.
         curr = 0
 
 
@@ -544,6 +568,9 @@ def get_profile_data_from_search_result(driver, pointer):
         driver.refresh()
         scroll_down(driver)
         get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        fullname = "Timeout"
+        url = "Timeout"
         
     try:
         #Wait until position appears in DOM.
@@ -555,6 +582,9 @@ def get_profile_data_from_search_result(driver, pointer):
         driver.refresh()
         scroll_down(driver)
         get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        job_title = "Timeout"
+        
         
     try:                               
         #Wait until position appears in DOM.
@@ -565,6 +595,8 @@ def get_profile_data_from_search_result(driver, pointer):
         driver.refresh()
         scroll_down(driver)
         get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        company = "Timeout"
 
     try:       
         #Wait until position appears in DOM.
@@ -575,6 +607,8 @@ def get_profile_data_from_search_result(driver, pointer):
         driver.refresh()
         scroll_down(driver)
         get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        location = "Timeout"
 
     person = Profile(company, fullname, job_title, location, url)
     leads.append(person)
@@ -698,4 +732,5 @@ def write_leads_to_excel_file(file_name, sheet_name):
     
     workbook.close()
 
-main()
+#main()
+populate_job_titles()
