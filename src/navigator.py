@@ -13,10 +13,11 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 
 
-titles =[]
+job_titles_list =[]
 industry = []
-companies = []
-geographies = []
+companies_list = []
+geographies_list = []
+seniorities_list = []
 
 leads = []
 page_urls = []
@@ -71,6 +72,12 @@ def test_search():
     #Take record of time that this program started running.
     start_time = time.time()
 
+    
+    #populate_geographies()
+    #populate_seniorities()
+    #populate_companies()
+    #populate_job_titles()
+
     driver = webdriver.Chrome("./chromedriver.exe")
 
     #Log into Linkedin Sales Navigator.
@@ -79,27 +86,22 @@ def test_search():
     #Open an empty search page in Sales Navigator    
     start_empty_search_in_sales_nav(driver)
 
-    #Following line of code has been commented out because the Linkedin returns too many request message.
-    #select_companies_in_search(driver, company_list)
-    company = "Trade Me"
-    select_a_company_in_search(driver, company)
-
-    #Select CXO as a seniority level. 
-    select_seniority_in_search(driver, "CXO")
-    select_seniority_in_search(driver, "VP")
-    select_seniority_in_search(driver, "Director")
-    select_seniority_in_search(driver, "Senior")
-    select_seniority_in_search(driver, "Manager")
+    #Select CXO as a seniority level.
+    #for seniority in seniorities_list:
+    #    select_seniority_in_search(driver, seniority)
 
     #Search and then select Australia as geographical location of the leads.
-    search_geography_in_search(driver, "Australia")
-    select_geography_in_search(driver)
-    time.sleep(1)
-    search_geography_in_search(driver, "Indonesia")
-    select_geography_in_search(driver)
-    time.sleep(1)
-    search_geography_in_search(driver, "Singapore")
-    select_geography_in_search(driver)
+    #for geography in geographies_list:
+    #    search_geography_in_search(driver, geography)
+    #    select_geography_in_search(driver)
+    #    time.sleep(1)
+
+    #Select Chief Marketing Officer as a title in search.
+    #for title in job_titles_list:
+    #    select_title_in_search(driver, title)
+
+    #Following line of code has been commented out because the Linkedin returns too many request message.
+    #select_companies_in_search(driver, companies_list)
 
     #Search and then select function of the leads.
     #search_function_in_search(driver, "Information Technology")
@@ -109,12 +111,7 @@ def test_search():
     #search_industry_in_search(driver, "retail")
     #select_industry_in_search(driver)
 
-    #Select Chief Marketing Officer as a title in search.
-    #for title in titles:
-    #    select_title_in_search(driver, title)
-
-    #driver.get("https://www.linkedin.com/sales/search/people?companySize=G%2CH%2CI&doFetchHeroCard=false&geoIncluded=101452733%2C102454443&industryIncluded=43%2C75%2C27%2C68%2C69%2C59%2C116%2C92%2C25%2C148%2C8&logHistory=true&rsLogId=1389016684&searchSessionId=COVLz%2FvhSsiVxYa0WgCntg%3D%3D&titleIncluded=Chief%2520Marketing%2520Officer%3A716%2CChief%2520Information%2520Officer%3A203%2CChief%2520Experience%2520Officer%3A30143%2CHead%2520Of%2520Customer%2520Experience%3A18497%2CChief%2520Digital%2520Officer%3A25884%2CChief%2520Digital%2520Transformation%2520Officer&titleTimeScope=CURRENT")
-    
+    driver.get('https://www.linkedin.com/sales/search/people?companyIncluded=Axis%2520Bank%2CBharti%2520Airtel%2CDr.%2520Reddy%27s%2520Laboratories%2CEquitas%2520Small%2520Finance%2520Bank%2CICICI%2520Bank%2CKotak%2520Mahindra%2520Bank%2COla%2CPaytm%2CReliance%2520Industries%2CSears%2520Holdings%2520India%2CStandard%2520Chartered%2520India%2CTata%2520Steel%2CYes%2520Bank&companyTimeScope=CURRENT&doFetchHeroCard=false&geoIncluded=102713980&logHistory=true&rsLogId=1428705508&searchSessionId=j%2BGgVH3XRrSuHuuoReu18A%3D%3D&seniorityIncluded=8%2C7%2C6%2C5&titleExcluded=VP%2520of%2520IT%2520Automation&titleIncluded=CTO%2CCIO%2CChief%2520Digital%2520officer%2CChief%2520Strategy%2520officer%2CChief%2520Digital%2520Information%2520officer%2CEVP%252C%2520Technology%2CGroup%2520Head%2520%2520IT%2CVP%2520of%2520Infra%2CVP%2520of%2520IT%2CVP%2520of%2520Operations%2CVP%2520of%2520IT%2520Ops%2CVP%2520of%2520Engineering%2CVP%2520of%2520application%2520development%2CDirector%2520of%2520IT%2520Operations%2CDirector%2520of%2520IT%2CHead%2520of%2520IT%2520Operations%2CIT%2520Operations%2520Manager%2CHead%2520of%2520Shared%2520Services%2520%25C3%25A2%25E2%2582%25AC%25E2%2580%259C%2520IT&titleTimeScope=CURRENT')
     
     #Zoom the browser to 60%.
     driver.execute_script("document.body.style.zoom='60%'")
@@ -131,9 +128,6 @@ def test_search():
 
     #Open each pages in the search. Append all page urls to page_urls list. 
     iterate_through_pages(driver)
-
-    #Close the browser and its process to prevent out of memory issue.
-    #driver.quit()
     
     #Open each page in the search one by one. 
     for url in page_urls:
@@ -145,11 +139,11 @@ def test_search():
     print("All results have been printed.")
 
     #Write the copied details into an excel file.
-    filename = "ByteDance_" + company + ".xlsx"
-    write_leads_to_excel_file(filename, company)
+    filename = "Workload_Automation_India.xlsx"
+    write_leads_to_excel_file(filename, "HCL_Automation")
     print("All leads data have been written to xlsx file.")
     
-    time.sleep(5)
+    time.sleep(1)
     
 
     print("---This program took %s seconds ---" % (time.time() - start_time))    
@@ -174,25 +168,25 @@ def temp_search(url):
 
 def populate_geographies():
     with open('geographies.txt') as f:
-        geographies_list = f.readlines()
-        for geo in gepgraphies_list:
+        geographies = f.readlines()
+        for geo in geographies:
             geo = geo.rstrip("\n")
-            geographies.append(seniority)
+            geographies_list.append(geo)
 
 def populate_seniorities():
     with open('seniorities.txt') as f:
-        seniorities_list = f.readlines()
-        for seniority in seniorities_list:
+        seniorities = f.readlines()
+        for seniority in seniorities:
             seniority = seniority.rstrip("\n")
-            seniorities.append(seniority)
+            seniorities_list.append(seniority)
 
 
 def populate_companies():
     with open('companies.txt') as f:
-        comps = f.readlines()
-        for comp in comps:
+        companies = f.readlines()
+        for comp in companies:
             comp = comp.rstrip("\n")
-            companies.append(comp)
+            companies_list.append(comp)
 
 
 def populate_job_titles():
@@ -200,7 +194,7 @@ def populate_job_titles():
         jobs = f.readlines()
         for job in jobs:
             job = job.rstrip("\n")
-            titles.append(job)
+            job_titles_list.append(job)
 
 
 
@@ -248,13 +242,15 @@ def start_empty_search_in_sales_nav(driver):
 
 
 def select_seniority_in_search(driver, level):
+    #Xpaths needed for this function
+    seniority_xpath = '//form[@class="search-filter__form"]/ul/li[10]'
 
     try:
         wait = WebDriverWait(driver, 10)
         # Wait until seniority tab element is found.
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[10]')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, seniority_xpath)))
         # Make seniority variable refer to Seniority level tab element in the Sales Navigator.
-        seniority = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[10]')
+        seniority = driver.find_element(By.XPATH, seniority_xpath)
         #Click open the Seniority level tab.
         seniority.click()
 
@@ -263,29 +259,32 @@ def select_seniority_in_search(driver, level):
         # XPATH must be as follows. The . checks the whole string value of the button element
         # Explanation is at https://stackoverflow.com/questions/23676537/xpath-for-button-having-text-as-new
         # '//form[@class="search-filter__form"]/ul/li[10]/div/div/div/ol/li/button[contains(.,' + lv + ' )]'
+        seniority_btn_xpath = '//form[@class="search-filter__form"]/ul/li[10]/div/div/div/ol/li/button[contains(.,' + lv + ' )]'
         
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[10]/div/div/div/ol/li/button[contains(.,' + lv + ' )]')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, seniority_btn_xpath)))
         # Get seniority list
-        seniority = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[10]/div/div/div/ol/li/button[contains(.,' + lv + ' )]')
-        seniority.click()
+        seniority_btn = driver.find_element(By.XPATH, seniority_btn_xpath)
+        seniority_btn.click()
 
     except Exception as e:
         print(e)
         driver.quit()
 
 
-
-
 def select_function_in_search(driver, category):
+    #Xpaths needed for this function
+    function_xpath = '//form[@class="search-filter__form"]/ul/li[11]'
+    function_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/input'
+    function_btn_xpath = '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button'
 
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, function_xpath)))
     
-        function = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]')
+        function = driver.find_element(By.XPATH, function_xpath)
         function.click()
 
-        function_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/input')
+        function_search_bar = driver.find_element(By.XPATH, function_search_bar_xpath)
         function_search_bar.send_keys(category)
         function_search_bar.send_keys(Keys.RETURN)
     except StaleElementReferenceException:
@@ -295,25 +294,27 @@ def select_function_in_search(driver, category):
 
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, function_btn_xpath)))
     
-        function_country_btn = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')
-        function_country_btn.send_keys(Keys.RETURN)
+        function_btn = driver.find_element(By.XPATH, function_btn_xpath)
+        function_btn.send_keys(Keys.RETURN)
 
     except (StaleElementReferenceException , TimeoutException):
         #driver.refresh()
         select_function_in_search(driver, category)
 
 
-
-
 def search_industry_in_search(driver, industry):
+    #Xpaths needed for this function
+    industry_filter_xpath = '//form[@class="search-filter__form"]/ul/li[8]'
+    industry_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/input'
+    
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[8]')))
-        industry_filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[8]')
+        element = wait.until(EC.presence_of_element_located((By.XPATH, industry_filter_xpath)))
+        industry_filter = driver.find_element(By.XPATH, industry_filter_xpath)
         industry_filter.click()
-        industry_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/input')
+        industry_search_bar = driver.find_element(By.XPATH, industry_search_bar_xpath)
         industry_search_bar.send_keys(industry)
         industry_search_bar.send_keys(Keys.RETURN)
         
@@ -323,27 +324,32 @@ def search_industry_in_search(driver, industry):
 
 
 def select_industry_in_search(driver):
+    #Xpaths needed for this function
+    industry_btn_xpath = '//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/ol/li[1]/button'
+    
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/ol/li[1]/button')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, industry_btn_xpath)))
     
-        industry_btn = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[8]//div[@class="ph4 pb4"]/ol/li[1]/button')
+        industry_btn = driver.find_element(By.XPATH, industry_btn_xpath)
         industry_btn.send_keys(Keys.RETURN)
 
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
         select_industry_in_search(driver)
-
-
-
+        
 
 def search_function_in_search(driver, function):
+    #Xpaths needed for this function
+    function_filter_xpath = '//form[@class="search-filter__form"]/ul/li[11]'
+    function_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/input'
+    
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]')))
-        function_filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]')
+        element = wait.until(EC.presence_of_element_located((By.XPATH, function_filter_xpath)))
+        function_filter = driver.find_element(By.XPATH, function_filter_xpath)
         function_filter.click()
-        function_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/input')
+        function_search_bar = driver.find_element(By.XPATH, function_search_bar_xpath)
         function_search_bar.send_keys(function)
         function_search_bar.send_keys(Keys.RETURN)
         
@@ -355,11 +361,14 @@ def search_function_in_search(driver, function):
 
 
 def select_function_in_search(driver):
+    #Xpath needed for this function
+    function_btn_xpath = '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button'
+    
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, function_btn_xpath)))
     
-        function_btn = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[11]//div[@class="ph4 pb4"]/ol/li[1]/button')
+        function_btn = driver.find_element(By.XPATH, function_btn_xpath)
         function_btn.send_keys(Keys.RETURN)
 
     except (StaleElementReferenceException , TimeoutException) as e:
@@ -368,16 +377,17 @@ def select_function_in_search(driver):
         select_function_in_search(driver)
 
 
-
-
 def search_geography_in_search(driver, country):
+    #Xpath needed for this function
+    geography_xpath  = '//form[@class="search-filter__form"]/ul/li[5]'
+    geography_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[5]//div[@class="ph4 pb4"]/input'
 
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[5]')))
-        geography = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[5]')
+        element = wait.until(EC.presence_of_element_located((By.XPATH,geography_xpath)))
+        geography = driver.find_element(By.XPATH, geography_xpath)
         geography.click()
-        geography_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[5]//div[@class="ph4 pb4"]/input')
+        geography_search_bar = driver.find_element(By.XPATH, geography_search_bar_xpath)
         geography_search_bar.send_keys(country)
         geography_search_bar.send_keys(Keys.RETURN)
         
@@ -386,12 +396,15 @@ def search_geography_in_search(driver, country):
         search_geography_in_search(driver, country)
 
 
-def select_geography_in_search(driver):    
+def select_geography_in_search(driver):
+    #Xpath needed for this function
+    geography_country_btn_xpath = '//form[@class="search-filter__form"]/ul/li[5]//div[@class="ph4 pb4"]/ol/li[1]/button'
+    
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[5]//div[@class="ph4 pb4"]/ol/li[1]/button')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, geography_country_btn_xpath)))
     
-        geography_country_btn = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[5]//div[@class="ph4 pb4"]/ol/li[1]/button')
+        geography_country_btn = driver.find_element(By.XPATH, geography_country_btn_xpath)
         geography_country_btn.send_keys(Keys.RETURN)
 
     except (StaleElementReferenceException , TimeoutException):
@@ -400,15 +413,18 @@ def select_geography_in_search(driver):
 
 
 def select_title_in_search(driver, title):
+    #Xpath needed for this function
+    title_filter_xpath = '//form[@class="search-filter__form"]/ul/li[12]'
+    filter_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[12]//div[@class="ph4 pb4"]/input'
     
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[12]')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, title_filter_xpath)))
     
-        filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[12]')
+        filter = driver.find_element(By.XPATH, title_filter_xpath)
         filter.click()
 
-        filter_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[12]//div[@class="ph4 pb4"]/input')
+        filter_search_bar = driver.find_element(By.XPATH, filter_search_bar_xpath)
         filter_search_bar.send_keys(title)
         filter_search_bar.send_keys(Keys.RETURN)
     except (StaleElementReferenceException , TimeoutException):
@@ -417,15 +433,19 @@ def select_title_in_search(driver, title):
         
 
 def select_titles_in_search(driver, titles):
+    #Xpaths needed for this function
+    title_filter_xpath = '//form[@class="search-filter__form"]/ul/li[12]'
+    filter_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[12]//div[@class="ph4 pb4"]/input'
     
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[12]')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, title_filter_xpath)))
     
-        filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[12]')
-        filter.click()
+        title_filter = driver.find_element(By.XPATH, title_filter_xpath)
+        title_filter.click()
 
-        filter_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[12]//div[@class="ph4 pb4"]/input')
+        filter_search_bar = driver.find_element(By.XPATH, filter_search_bar_xpath)
+
         for title in titles:
             filter_search_bar.send_keys(title)
             filter_search_bar.send_keys(Keys.RETURN)
@@ -435,32 +455,40 @@ def select_titles_in_search(driver, titles):
 
 
 def select_companies_in_search(driver, companies):
+    #Xpaths needed for this function
+    nav_filter_xpath = '//form[@class="search-filter__form"]/ul/li[7]'
+    filter_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[7]//div[@class="ph4 pb4"]/input'
     
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[7]')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH, nav_filter_xpath)))
     
-        filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[7]')
-        filter.click()
+        nav_filter = driver.find_element(By.XPATH, nav_filter_xpath)
+        nav_filter.click()
 
-        filter_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[7]//div[@class="ph4 pb4"]/input')
+        filter_search_bar = driver.find_element(By.XPATH, filter_search_bar_xpath)
+        
         for company in companies:
             filter_search_bar.send_keys(company)
             filter_search_bar.send_keys(Keys.RETURN)
+            time.sleep(1)
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
         select_companies_in_search(driver, companies)
 
 def select_a_company_in_search(driver, company):
+    #Xpaths needed for this function.
+    nav_filter_xpath = '//form[@class="search-filter__form"]/ul/li[7]'
+    filter_search_bar_xpath = '//form[@class="search-filter__form"]/ul/li[7]//div[@class="ph4 pb4"]/input'
     
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH,'//form[@class="search-filter__form"]/ul/li[7]')))
+        element = wait.until(EC.presence_of_element_located((By.XPATH,nav_filter_xpath)))
     
-        filter = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[7]')
-        filter.click()
+        nav_filter = driver.find_element(By.XPATH, nav_filter_xpath)
+        nav_filter.click()
 
-        filter_search_bar = driver.find_element(By.XPATH, '//form[@class="search-filter__form"]/ul/li[7]//div[@class="ph4 pb4"]/input')
+        filter_search_bar = driver.find_element(By.XPATH, filter_search_bar_xpath)
         filter_search_bar.send_keys(company)
         filter_search_bar.send_keys(Keys.RETURN)
     except (StaleElementReferenceException , TimeoutException):
@@ -468,13 +496,15 @@ def select_a_company_in_search(driver, company):
         select_companies_in_search(driver, companies)
 
 def get_num_of_search_result_pages(driver):
-# I want to know the number of pages of search results   
-
+    # I want to know the number of pages of search results   
+    # Xpaths needed fot this function
+    pagenation_list_xpath = '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]'
+    page_number_xpath = '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]/li[last()]/button'
+    
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]')))
-    
-        page_num = driver.find_element(By.XPATH, '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]/li[last()]/button').text
+        element = wait.until(EC.presence_of_element_located((By.XPATH, pagenation_list_xpath)))
+        page_num = driver.find_element(By.XPATH, page_number_xpath).text
 
     except NoSuchElementException:
         print("There is 1 page.")
@@ -487,10 +517,15 @@ def get_num_of_search_result_pages(driver):
     return page_num
 
 def get_num_of_search_results_in_current_page(driver):
+
+    #Xpaths needed for this function.
+    search_results_xpath = '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]'
+    html_list_xpath = '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]/li'
+    
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]')))
-        html_list = driver.find_elements(By.XPATH, '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]/li')
+        element = wait.until(EC.presence_of_element_located((By.XPATH, search_results_xpath)))
+        html_list = driver.find_elements(By.XPATH, html_list_xpath)
         results_num = len(html_list)
     except StaleElementReferenceException:
         results_num = 0
@@ -508,6 +543,10 @@ def iterate_through_pages(driver):
     page_num = int(get_num_of_search_result_pages(driver))
     curr = 1
 
+    #Xpaths needed for iterating through the pages.
+    page_list_xpath = '//div/nav/ol[@class="search-results__pagination-list"]'
+    next_page_xpath = '//div/nav/ol[@class="search-results__pagination-list"]/li[@class="selected cursor-pointer"]/following-sibling::li/button'
+
     #Start populating a list of all page urls, starting with current page url.
     page_urls.append(driver.current_url)
 
@@ -517,8 +556,8 @@ def iterate_through_pages(driver):
         
         try:
             wait = WebDriverWait(driver, 10)
-            element = wait.until(EC.presence_of_element_located((By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]')))
-            nextPage = driver.find_element(By.XPATH, '//div/nav/ol[@class="search-results__pagination-list"]/li[@class="selected cursor-pointer"]/following-sibling::li/button')
+            element = wait.until(EC.presence_of_element_located((By.XPATH, page_list_xpath )))
+            nextPage = driver.find_element(By.XPATH, next_page_xpath)
             nextPage.send_keys(Keys.RETURN)
             
             time.sleep(2)
@@ -557,13 +596,19 @@ def get_profile_data_from_search_result(driver, pointer):
     #Use string of pointer for XPATH
     pointer_str = str(pointer)
 
+    #Xpaths for fullname, job title, company and location.
+    fullname_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//dt[@class="result-lockup__name"]/a'
+    jobtitle_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//dd[@class="result-lockup__highlight-keyword"]/span[1]'
+    company_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//dd[@class="result-lockup__highlight-keyword"]/span[2]/span/a/span[1]'
+    location_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//li[@class="result-lockup__misc-item"]'
+
     try:
         #Wait until full name appears in DOM.
-        elem1 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dt/a')))
+        elem1 = wait.until(EC.presence_of_element_located((By.XPATH, fullname_xpath)))
         #Get the full name.
-        fullname = driver.find_element(By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dt/a').text
-        url = driver.find_element(By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dt/a').get_attribute('href')
-
+        fullname = driver.find_element(By.XPATH, fullname_xpath).text
+        url = driver.find_element(By.XPATH, fullname_xpath).get_attribute('href')
+                                                          
     except StaleElementReferenceException:
         driver.refresh()
         scroll_down(driver)
@@ -574,9 +619,9 @@ def get_profile_data_from_search_result(driver, pointer):
         
     try:
         #Wait until position appears in DOM.
-        elem2 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dd[2]/span[1]')))
+        elem2 = wait.until(EC.presence_of_element_located((By.XPATH, jobtitle_xpath)))
         #Get the position. 
-        job_title = driver.find_element(By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dd[2]/span[1]').text
+        job_title = driver.find_element(By.XPATH, jobtitle_xpath).text
 
     except StaleElementReferenceException:
         driver.refresh()
@@ -588,9 +633,9 @@ def get_profile_data_from_search_result(driver, pointer):
         
     try:                               
         #Wait until position appears in DOM.
-        elem3 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dd[2]/span[2]/span/a/span[1]')))
+        elem3 = wait.until(EC.presence_of_element_located((By.XPATH, company_xpath)))
         #Get the position. 
-        company = driver.find_element(By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dd[2]/span[2]/span/a/span[1]').text
+        company = driver.find_element(By.XPATH, company_xpath).text
     except StaleElementReferenceException:
         driver.refresh()
         scroll_down(driver)
@@ -600,9 +645,9 @@ def get_profile_data_from_search_result(driver, pointer):
 
     try:       
         #Wait until position appears in DOM.
-        elem4 = wait.until(EC.presence_of_element_located((By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dd[4]/ul/li')))
+        elem4 = wait.until(EC.presence_of_element_located((By.XPATH, location_xpath)))
         #Get the position. 
-        location = driver.find_element(By.XPATH, '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']/div[2]/div/div/div/article/section[1]/div[1]/div/dl/dd[4]/ul/li').text
+        location = driver.find_element(By.XPATH, location_xpath).text
     except StaleElementReferenceException:
         driver.refresh()
         scroll_down(driver)
@@ -732,5 +777,4 @@ def write_leads_to_excel_file(file_name, sheet_name):
     
     workbook.close()
 
-#main()
-populate_job_titles()
+main()
