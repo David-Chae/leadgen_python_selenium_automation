@@ -11,73 +11,192 @@ import time
 import re, string
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
-
+from specifier import Profile , Account
 
 job_titles_list =[]
 industry = []
 companies_list = []
 geographies_list = []
 seniorities_list = []
+page_urls_list = []
 
 leads = []
+#This list contain the Account objects instantiated from going through results in account search results.
+accounts = []
 page_urls = []
-
-class Profile:
-
-    def __init__(self, company, fullname, job_title, location, url):
-        self._company = company
-        self._job_title = job_title
-        self._location = location
-        self._url = url
-        self._full_name = self.get_full_name(fullname)
-        self._first_name = self.get_first_name(fullname)
-        self._last_name = self.get_last_name(fullname)
-
-    def get_company(self):
-        return self._company
-    
-    def get_fullname(self):
-        return self._fullname
-
-    def get_job_title(self):
-        return self._job_title
-
-    def get_location(self):
-        return self._location
-
-    def get_url(self):
-        return self._url
-
-    def get_full_name(self, fullname):
-        pattern = re.compile('[\W_]+', re.UNICODE)
-        return re.sub(pattern, ' ', fullname)
-
-    def get_first_name(self, fullname):
-        name = HumanName(self.get_full_name(fullname))
-        return name.first
-    
-    def get_last_name(self, fullname):
-        name = HumanName(self.get_full_name(fullname))
-        return name.last
 
 
 def main():
-    test_search()
-    
-    
+    #leads_search()
+    #accounts_search()
+    extractFromAccountPages()
 
-def test_search():
+def extractFromAccountPages():
+    #Take record of time that this program started running.
+    start_time = time.time()
 
+    #Read text file for opening compant account pages in Sales Navigator.
+    populate_accounts_pages()
+
+    #Instantiate a Chrome webdriver
+    driver = webdriver.Chrome("./chromedriver.exe")
+    
+    #Log into Linkedin Sales Navigator.
+    log_into_linked_in_sales_nav(driver)
+
+    #Open an empty search page in Sales Navigator    
+    start_empty_search_in_sales_nav(driver)
+
+    for page_url in page_urls_list:
+        driver.get(page_url)
+        
+        proceed = click_decision_makers(driver)
+
+        if proceed == False: continue
+
+        #Scroll Down
+        scroll_down(driver)
+
+        #Get the number of pages in the search results. page_num is a string.
+        page_num = get_num_of_search_result_pages(driver)
+        print("You are now ready to move on to working with " + str(page_num) + " pages.")
+        
+        #Get the number of search results in the current page.
+        results_num = get_num_of_search_results_in_current_page(driver)
+        print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
+
+        page_urls.clear()
+
+        #Open each pages in the search. Append all page urls to page_urls list. 
+        iterate_through_pages(driver)
+        
+        #Open each page in the search one by one. 
+        for url in page_urls:
+            #Bring current page
+            driver.get(url)
+            #Go through all the search results in this page.
+            iterate_through_results(driver)
+
+            
+    #Write the copied details into an excel file.
+    filename = "CX_decision_makers.xlsx"
+    write_leads_to_excel_file(filename, "CX_Decision_makers")
+    print("All accounts data have been written to xlsx file.")
+    
+    time.sleep(1)
+    
+    print("---This program took %s seconds ---" % (time.time() - start_time)) 
+        
+def click_decision_makers(driver):
+    #Xpath needed for navigating to decision makers.
+    btn_xpath = '//span[@class="account-top-card__search-leads"]/a'
+
+    #GET Decision makers btn and Click it.
+    try:
+        #Wait until element appears in DOM.
+        wait = WebDriverWait(driver, 20)
+        element = wait.until(EC.element_to_be_clickable((By.XPATH, btn_xpath)))
+        #Get the full name.
+        btn = driver.find_element(By.XPATH, btn_xpath)
+        btn.click()
+                                                                  
+    except StaleElementReferenceException:
+        print("StaleElementReferenceException at clicking Decision makers button: ")
+        print(driver.current_url)
+        return False
+    except TimeoutException:
+        print("TimeoutException at clicking Decision makers button: ")
+        print(driver.current_url)
+        return False
+
+    return True
+
+
+def leads_search():
+    #Take record of time that this program started running.
+    start_time = time.time()
+
+    #Read text files for selecting filters in Sales Navigator.
+    #populate_geographies()
+    #populate_seniorities()
+    populate_companies()
+    #populate_job_titles()
+
+    #Instantiate a Chrome webdriver
+    driver = webdriver.Chrome("./chromedriver.exe")
+
+    #Log into Linkedin Sales Navigator.
+    log_into_linked_in_sales_nav(driver)
+
+    #Open an empty search page in Sales Navigator    
+    start_empty_search_in_sales_nav(driver)
+
+    #Select CXO as a seniority level.
+    #for seniority in seniorities_list:
+    #    select_seniority_in_search(driver, seniority)
+
+    #Give time for Linkedin Sales Navigator to not think that I am Bot.
+    #time.sleep(1)
+    
+    #Search and then select Australia as geographical location of the leads.
+    #for geography in geographies_list:
+    #    search_geography_in_search(driver, geography)
+    #    select_geography_in_search(driver)
+
+    #Select Chief Marketing Officer as a title in search.
+    #for title in job_titles_list:
+    #    select_title_in_search(driver, title)
+
+    driver.get('https://www.linkedin.com/sales/search/people?_ntb=3EfQ5PAaR%2B2ekXE8mehYVQ%3D%3D&doFetchHeroCard=false&geoIncluded=101452733&keywords=omni%20channel%20solution&logHistory=true&rsLogId=1437635828&searchSessionId=muAfrqFmQMKH5JAHXMd6Sw%3D%3D&seniorityIncluded=8%2C6%2C7')
+    
+    #Following line of code has been commented out because the Linkedin returns too many request message.
+    #select_companies_in_search(driver, companies_list)
+
+    print("Current search results page URL: " + driver.current_url)
+
+    #Zoom the browser to 60%.
+    driver.execute_script("document.body.style.zoom='60%'")
+    scroll_down(driver)
+
+    #Get the number of pages in the search results. page_num is a string.
+    page_num = get_num_of_search_result_pages(driver)
+    print("You are now ready to move on to working with " + str(page_num) + " pages.")
+    
+    #Get the number of search results in the current page.
+    results_num = get_num_of_search_results_in_current_page(driver)
+    print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
+
+    #Open each pages in the search. Append all page urls to page_urls list. 
+    iterate_through_pages(driver)
+    
+    #Open each page in the search one by one. 
+    for url in page_urls:
+        #Bring current page
+        driver.get(url)
+        #Go through all the search results in this page.
+        iterate_through_results(driver)
+
+    #Write the copied details into an excel file.
+    filename = "CX_Leads.xlsx"
+    write_leads_to_excel_file(filename, "CX_Ecommerce")
+    print("All accounts data have been written to xlsx file.")
+    
+    time.sleep(1)
+    
+    print("---This program took %s seconds ---" % (time.time() - start_time)) 
+
+def accounts_search():
     
     #Take record of time that this program started running.
     start_time = time.time()
 
-    
-    #populate_geographies()
-    #populate_seniorities()
-    #populate_companies()
-    #populate_job_titles()
+    #Read text files for selecting filters in Sales Navigator.
+    populate_geographies()
+    populate_seniorities()
+    populate_companies()
+    populate_job_titles()
 
+    #Instantiate a Chrome webdriver
     driver = webdriver.Chrome("./chromedriver.exe")
 
     #Log into Linkedin Sales Navigator.
@@ -99,7 +218,8 @@ def test_search():
     #Select Chief Marketing Officer as a title in search.
     #for title in job_titles_list:
     #    select_title_in_search(driver, title)
-
+    #time.sleep(10)
+    
     #Following line of code has been commented out because the Linkedin returns too many request message.
     #select_companies_in_search(driver, companies_list)
 
@@ -111,8 +231,7 @@ def test_search():
     #search_industry_in_search(driver, "retail")
     #select_industry_in_search(driver)
 
-    driver.get('https://www.linkedin.com/sales/search/people?companyIncluded=Axis%2520Bank%2CBharti%2520Airtel%2CDr.%2520Reddy%27s%2520Laboratories%2CEquitas%2520Small%2520Finance%2520Bank%2CICICI%2520Bank%2CKotak%2520Mahindra%2520Bank%2COla%2CPaytm%2CReliance%2520Industries%2CSears%2520Holdings%2520India%2CStandard%2520Chartered%2520India%2CTata%2520Steel%2CYes%2520Bank&companyTimeScope=CURRENT&doFetchHeroCard=false&geoIncluded=102713980&logHistory=true&rsLogId=1428705508&searchSessionId=j%2BGgVH3XRrSuHuuoReu18A%3D%3D&seniorityIncluded=8%2C7%2C6%2C5&titleExcluded=VP%2520of%2520IT%2520Automation&titleIncluded=CTO%2CCIO%2CChief%2520Digital%2520officer%2CChief%2520Strategy%2520officer%2CChief%2520Digital%2520Information%2520officer%2CEVP%252C%2520Technology%2CGroup%2520Head%2520%2520IT%2CVP%2520of%2520Infra%2CVP%2520of%2520IT%2CVP%2520of%2520Operations%2CVP%2520of%2520IT%2520Ops%2CVP%2520of%2520Engineering%2CVP%2520of%2520application%2520development%2CDirector%2520of%2520IT%2520Operations%2CDirector%2520of%2520IT%2CHead%2520of%2520IT%2520Operations%2CIT%2520Operations%2520Manager%2CHead%2520of%2520Shared%2520Services%2520%25C3%25A2%25E2%2582%25AC%25E2%2580%259C%2520IT&titleTimeScope=CURRENT')
-    
+    driver.get('https://www.linkedin.com/sales/search/company?_ntb=3EfQ5PAaR%2B2ekXE8mehYVQ%3D%3D&geoIncluded=101452733&keywords=omni%20channel%20solution&searchSessionId=muAfrqFmQMKH5JAHXMd6Sw%3D%3D')
     #Zoom the browser to 60%.
     driver.execute_script("document.body.style.zoom='60%'")
 
@@ -120,7 +239,7 @@ def test_search():
 
     #Get the number of pages in the search results. page_num is a string.
     page_num = get_num_of_search_result_pages(driver)
-    print("You are now ready to move on to working with " + page_num + " pages.")
+    print("You are now ready to move on to working with " + str(page_num) + " pages.")
     
     #Get the number of search results in the current page.
     results_num = get_num_of_search_results_in_current_page(driver)
@@ -134,19 +253,153 @@ def test_search():
         #Bring current page
         driver.get(url)
         #Go through all the search results in this page.
-        iterate_through_results(driver)
+        iterate_through_companies(driver)
 
-    print("All results have been printed.")
+    print("All urls have been printed.")
 
     #Write the copied details into an excel file.
-    filename = "Workload_Automation_India.xlsx"
-    write_leads_to_excel_file(filename, "HCL_Automation")
-    print("All leads data have been written to xlsx file.")
+    filename = "Omni_Channel_Accounts.xlsx"
+    write_accounts_to_excel_file(filename, "Test")
+    print("All accounts data have been written to xlsx file.")
     
     time.sleep(1)
     
 
     print("---This program took %s seconds ---" % (time.time() - start_time))    
+
+
+def iterate_through_companies(driver):
+    results_num = get_num_of_search_results_in_current_page(driver)
+    scroll_down(driver)
+
+    if results_num > 0:
+        curr = 1
+        while curr <= results_num:
+            get_company_data_from_search_result(driver, curr)
+            curr+=1
+    else:
+        curr = 0
+
+
+def get_company_data_from_search_result(driver, curr):
+    #Get the number of results in the current page.
+    results_num = get_num_of_search_results_in_current_page(driver)
+
+    #Initialise this WebDriverWait instance so I can use in the loop below.
+    wait = WebDriverWait(driver, 10)
+
+    #Use string of pointer for XPATH
+    pointer_str = str(curr)
+
+    #Xpaths for fullname, job title, company and location.
+    company_name_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//dt[@class="result-lockup__name"]/a'
+    industry_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//li[1][@class="result-lockup__misc-item"]'
+    headcount_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//li[2][@class="result-lockup__misc-item"]'
+    location_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//li[3][@class="result-lockup__misc-item"]'
+    description_xpath = '//ol[@class="search-results__result-list"]/li[' + pointer_str + ']//dd[@class="result-lockup__description"]/div/span[2]'
+
+    #GET COMPANY NAME AND URL
+    try:
+        #Wait until element appears in DOM.
+        elem1 = wait.until(EC.presence_of_element_located((By.XPATH, company_name_xpath)))
+        #Get the full name.
+        company_name = driver.find_element(By.XPATH, company_name_xpath).text
+        company_name_url = driver.find_element(By.XPATH, company_name_xpath).get_attribute('href')
+                                                          
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_company_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        fullname = "Timeout"
+        url = "Timeout"
+
+    #GET INDUSTRY (CATEGORY)
+    try:
+        #Wait until element appears in DOM.
+        elem2 = wait.until(EC.presence_of_element_located((By.XPATH, industry_xpath)))
+        #Get the position. 
+        industry = driver.find_element(By.XPATH, industry_xpath).text
+
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_company_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        industry = "Timeout"
+        
+    #GET HEADCOUNT
+    try:                               
+        #Wait until element appears in DOM.
+        elem3 = wait.until(EC.presence_of_element_located((By.XPATH, headcount_xpath)))
+        #Get the position. 
+        headcount = driver.find_element(By.XPATH, headcount_xpath).text
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_company_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        headcount = "Timeout"
+
+    #GET LOCATION
+    try:       
+        #Wait until element appears in DOM.
+        elem4 = wait.until(EC.presence_of_element_located((By.XPATH, location_xpath)))
+        #Get the position. 
+        location = driver.find_element(By.XPATH, location_xpath).text
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_company_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        location = "Timeout"
+
+    #GET COMPANY DESCRIPTION
+    try:       
+        #Wait until element appears in DOM.
+        elem4 = wait.until(EC.presence_of_element_located((By.XPATH, description_xpath)))
+        #Get the position. 
+        description = driver.find_element(By.XPATH, description_xpath).text
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_company_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        description = "Timeout"
+
+    company = Account(company_name, company_name_url, industry, headcount, location, description)
+    accounts.append(company)
+
+    print(company._company_name + "%^&" + company._industry + "%^&" + company._headcount + "%^&" + company._location + "%^&" + company._description + "%^&" + company._company_name_url)
+    print("  ")
+
+
+def write_accounts_to_excel_file(file_name, sheet_name):
+    # file_name e.g "leads_.xlsx"
+    workbook = xlsxwriter.Workbook(file_name)
+    # sheet_name e.g "HCL Appscan 2022"
+    worksheet = workbook.add_worksheet(sheet_name)
+
+    row = 1
+    col = 0
+
+    header = ["COMPANY NAME", "INDUSTRY", "HEADCOUNT", "LOCATION", "DESCRIPTION", "LINKEDIN URL"]
+
+    for hd in header:
+        worksheet.write(0, col, hd)
+        col+=1
+
+    for account in accounts:
+        worksheet.write(row, 0, account._company_name)
+        worksheet.write(row, 1, account._industry)
+        worksheet.write(row, 2, account._headcount)
+        worksheet.write(row, 3, account._location)
+        worksheet.write(row, 4, account._description)
+        worksheet.write(row, 5, account._company_name_url)
+        print(str(row) + " accounts written to file.")
+        row+=1        
+    
+    workbook.close()
 
 
 def temp_search(url):
@@ -165,6 +418,12 @@ def temp_search(url):
     #Close the browser and its process in the background.
     temp_driver.quit()
 
+def populate_accounts_pages():
+    with open('accounts_pages.txt') as f:
+        pages_urls = f.readlines()
+        for page in pages_urls:
+            page = page.rstrip("\n")
+            page_urls_list.append(page)
 
 def populate_geographies():
     with open('geographies.txt') as f:
@@ -461,7 +720,7 @@ def select_companies_in_search(driver, companies):
     
     try:
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH, nav_filter_xpath)))
+        element = wait.until(EC.element_to_be_clickable((By.XPATH, nav_filter_xpath)))
     
         nav_filter = driver.find_element(By.XPATH, nav_filter_xpath)
         nav_filter.click()
@@ -505,42 +764,42 @@ def get_num_of_search_result_pages(driver):
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH, pagenation_list_xpath)))
         page_num = driver.find_element(By.XPATH, page_number_xpath).text
+        page_num = int(page_num)
 
     except NoSuchElementException:
         print("There is 1 page.")
-        return "1"
+        return 1
         
     except (StaleElementReferenceException , TimeoutException):
-        driver.refresh()
-        get_num_of_search_result_pages(driver)
+        return 0
 
     return page_num
 
 def get_num_of_search_results_in_current_page(driver):
 
     #Xpaths needed for this function.
-    search_results_xpath = '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]'
-    html_list_xpath = '//section[@id="results"]/div/div/ol[@class="search-results__result-list"]/li'
+    search_results_xpath = '//section[@id="results"]//ol[@class="search-results__result-list"]'
+    html_list_xpath = '//section[@id="results"]//ol[@class="search-results__result-list"]/li'
     
     try:
         wait = WebDriverWait(driver, 10)
         element = wait.until(EC.presence_of_element_located((By.XPATH, search_results_xpath)))
         html_list = driver.find_elements(By.XPATH, html_list_xpath)
-        results_num = len(html_list)
+        results_num = int(len(html_list))
     except StaleElementReferenceException:
         results_num = 0
     except TimeoutException:
-        driver.refresh() 
-        get_num_of_search_results_in_current_page(driver)
+        results_num = 0
         
     return results_num
 
 
 
 
+
 def iterate_through_pages(driver):
     
-    page_num = int(get_num_of_search_result_pages(driver))
+    page_num = get_num_of_search_result_pages(driver)
     curr = 1
 
     #Xpaths needed for iterating through the pages.
