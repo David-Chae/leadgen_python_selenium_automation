@@ -27,9 +27,9 @@ page_urls = []
 
 
 def main():
-    #leads_search()
+    leads_search()
     #accounts_search()
-    extractFromAccountPages()
+    #extractFromAccountPages()
 
 def extractFromAccountPages():
     #Take record of time that this program started running.
@@ -54,17 +54,13 @@ def extractFromAccountPages():
 
         if proceed == False: continue
 
-        #Scroll Down
-        scroll_down(driver)
-
         #Get the number of pages in the search results. page_num is a string.
         page_num = get_num_of_search_result_pages(driver)
-        print("You are now ready to move on to working with " + str(page_num) + " pages.")
-        
-        #Get the number of search results in the current page.
-        results_num = get_num_of_search_results_in_current_page(driver)
-        print("You are now ready to move on to working with " + str(results_num) + " results in current page.")
 
+        if page_num == 0:
+            print("There are no decision makers in this account.")
+            continue
+        
         page_urls.clear()
 
         #Open each pages in the search. Append all page urls to page_urls list. 
@@ -147,15 +143,15 @@ def leads_search():
     #for title in job_titles_list:
     #    select_title_in_search(driver, title)
 
-    driver.get('https://www.linkedin.com/sales/search/people?_ntb=3EfQ5PAaR%2B2ekXE8mehYVQ%3D%3D&doFetchHeroCard=false&geoIncluded=101452733&keywords=omni%20channel%20solution&logHistory=true&rsLogId=1437635828&searchSessionId=muAfrqFmQMKH5JAHXMd6Sw%3D%3D&seniorityIncluded=8%2C6%2C7')
-    
+    driver.get('https://www.linkedin.com/sales/search/people?doFetchHeroCard=false&logHistory=true&rsLogId=1440626332&searchSessionId=Fl2Sd0y0QfS%2BJJuxD8glLA%3D%3D&seniorityIncluded=7%2C8%2C6')
+    time.sleep(3)
     #Following line of code has been commented out because the Linkedin returns too many request message.
-    #select_companies_in_search(driver, companies_list)
+    select_companies_in_search(driver, companies_list)
 
     print("Current search results page URL: " + driver.current_url)
 
     #Zoom the browser to 60%.
-    driver.execute_script("document.body.style.zoom='60%'")
+    driver.execute_script("document.body.style.zoom='25%'")
     scroll_down(driver)
 
     #Get the number of pages in the search results. page_num is a string.
@@ -177,8 +173,8 @@ def leads_search():
         iterate_through_results(driver)
 
     #Write the copied details into an excel file.
-    filename = "CX_Leads.xlsx"
-    write_leads_to_excel_file(filename, "CX_Ecommerce")
+    filename = "CX_Decision_Makers_new.xlsx"
+    write_leads_to_excel_file(filename, "CX_Decision_Makers")
     print("All accounts data have been written to xlsx file.")
     
     time.sleep(1)
@@ -729,11 +725,25 @@ def select_companies_in_search(driver, companies):
         
         for company in companies:
             filter_search_bar.send_keys(company)
-            filter_search_bar.send_keys(Keys.RETURN)
+            select_first_company_in_search(driver, filter_search_bar)
             time.sleep(1)
     except (StaleElementReferenceException , TimeoutException):
         driver.refresh()
         select_companies_in_search(driver, companies)
+
+def select_first_company_in_search(driver, filter_search_bar):
+    #Xpath needed for this function
+    first_company_btn_xpath = '//form[@class="search-filter__form"]/ul/li[7]//div[@class="ph4 pb4"]/ol/li[1]/button'
+    
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, first_company_btn_xpath)))
+    
+        first_company_btn = driver.find_element(By.XPATH, first_company_btn_xpath)
+        first_company_btn.send_keys(Keys.RETURN)
+
+    except (StaleElementReferenceException, TimeoutException):
+        filter_search_bar.send_keys(Keys.RETURN)
 
 def select_a_company_in_search(driver, company):
     #Xpaths needed for this function.
@@ -761,7 +771,7 @@ def get_num_of_search_result_pages(driver):
     page_number_xpath = '//section[@id="results"]/div/nav/ol[@class="search-results__pagination-list"]/li[last()]/button'
     
     try:
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 5)
         element = wait.until(EC.presence_of_element_located((By.XPATH, pagenation_list_xpath)))
         page_num = driver.find_element(By.XPATH, page_number_xpath).text
         page_num = int(page_num)
