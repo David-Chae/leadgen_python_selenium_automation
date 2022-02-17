@@ -24,12 +24,201 @@ leads = []
 #This list contain the Account objects instantiated from going through results in account search results.
 accounts = []
 page_urls = []
-
+lead_list_page_urls = []
 
 def main():
-    leads_search()
+    #leads_search()
     #accounts_search()
     #extractFromAccountPages()
+    url = "https://www.linkedin.com/sales/lists/people/6898866974911295488?sortCriteria=CREATED_TIME&sortOrder=DESCENDING"
+    goThroughLeadList(url)
+
+def goThroughLeadList(url):
+    #Take record of time that this program started running.
+    start_time = time.time()
+
+    #Instantiate a Chrome webdriver
+    driver = webdriver.Chrome("./chromedriver.exe")
+
+    #Log into Linkedin Sales Navigator.
+    log_into_linked_in_sales_nav(driver)
+
+    driver.get(url)
+
+    time.sleep(3)
+
+    iterate_through_lead_list_pages(driver)
+
+    for page_url in lead_list_page_urls:
+        driver.get(page_url)
+        #Go through all the search results in this page.
+        iterate_through_leads_in_list(driver)
+        
+
+    driver.quit()
+
+    print("---This program took %s seconds ---" % (time.time() - start_time)) 
+
+
+def iterate_through_leads_in_list(driver):
+    results_num = get_num_of_leads_in_current_page(driver)
+    scroll_down(driver)
+    print("Detected " + str(results_num) + " results in this page")
+
+    if results_num > 0:
+        curr = 1
+        while curr <= results_num:
+            #open_search_results(driver, curr)
+            get_profile_data_from_lead_list(driver, curr)
+            curr+=1
+    else:
+        curr = 0
+
+#Currently in development
+def get_profile_data_from_lead_list(driver, pointer):
+    
+    #Get the number of results in the current page.
+    results_num = get_num_of_leads_in_current_page(driver)
+
+    #Initialise this WebDriverWait instance so I can use in the loop below.
+    wait = WebDriverWait(driver, 10)
+
+    #Use string of pointer for XPATH
+    pointer_str = str(pointer)
+
+    #Xpaths for fullname, job title, company and location.
+    xpath_to_table_row = '/html/body/main/div[2]/div[1]/div[4]/table/tbody/tr['
+    fullname_xpath = xpath_to_table_row + pointer_str + ']/td[1]/div/div[2]/div[1]/div[1]/a'
+    jobtitle_xpath = xpath_to_table_row + pointer_str + ']/td[1]/div/div[2]/div[2]/span/div'
+    company_xpath = xpath_to_table_row + pointer_str + ']/td[2]/div/span/div[1]/button/div/div/div/span'
+    location_xpath = xpath_to_table_row + pointer_str + ']/td[3]'
+
+    try:
+        #Wait until full name appears in DOM.
+        elem1 = wait.until(EC.presence_of_element_located((By.XPATH, fullname_xpath)))
+        #Get the full name.
+        fullname = driver.find_element(By.XPATH, fullname_xpath).text
+        url = driver.find_element(By.XPATH, fullname_xpath).get_attribute('href')
+                                                          
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        fullname = "Timeout"
+        url = "Timeout"
+        
+    try:
+        #Wait until position appears in DOM.
+        elem2 = wait.until(EC.presence_of_element_located((By.XPATH, jobtitle_xpath)))
+        #Get the position. 
+        job_title = driver.find_element(By.XPATH, jobtitle_xpath).text
+
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        job_title = "Timeout"
+        
+        
+    try:                               
+        #Wait until position appears in DOM.
+        elem3 = wait.until(EC.presence_of_element_located((By.XPATH, company_xpath)))
+        #Get the position. 
+        company = driver.find_element(By.XPATH, company_xpath).text
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        company = "Timeout"
+
+    try:       
+        #Wait until position appears in DOM.
+        elem4 = wait.until(EC.presence_of_element_located((By.XPATH, location_xpath)))
+        #Get the position. 
+        location = driver.find_element(By.XPATH, location_xpath).text
+    except StaleElementReferenceException:
+        driver.refresh()
+        scroll_down(driver)
+        get_profile_data_from_search_result(driver, pointer)
+    except TimeoutException:
+        location = "Timeout"
+
+    person = Profile(company, fullname, job_title, location, url)
+    leads.append(person)
+
+    print(person._company + "%^&" + person._full_name + "%^&" + person._first_name + "%^&" + person._last_name + "%^&" + person._location + "%^&" + person._job_title + "%^&" + person._url)
+    print("  ")
+    
+
+def get_num_of_leads_in_current_page(driver):
+
+    #Xpaths needed for this function.
+    search_results_xpath = '/html/body/main/div[2]/div[1]/div[4]/table/tbody'
+    html_list_xpath = '/html/body/main/div[2]/div[1]/div[4]/table/tbody/tr'
+    
+    try:
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, search_results_xpath)))
+        html_list = driver.find_elements(By.XPATH, html_list_xpath)
+        results_num = int(len(html_list))
+    except StaleElementReferenceException:
+        results_num = 0
+    except TimeoutException:
+        results_num = 0
+        
+    return results_num
+
+def iterate_through_lead_list_pages(driver):
+    
+    page_num = get_num_of_lead_list_pages(driver)
+    curr = 1
+
+    #Xpaths needed for iterating through the pages.
+    page_list_xpath = '//main[@id="content-main"]//ul[@class="artdeco-pagination__pages artdeco-pagination__pages--number"]'
+    next_page_xpath = '//main[@id="content-main"]//ul[@class="artdeco-pagination__pages artdeco-pagination__pages--number"]/li[@class="artdeco-pagination__indicator artdeco-pagination__indicator--number active selected ember-view"]/following-sibling::li/button'
+
+    #Start populating a list of all page urls, starting with current page url.
+    lead_list_page_urls.append(driver.current_url)
+
+    #iterate_through_results(driver)
+    while curr < page_num:
+        curr+=1
+        
+        try:
+            wait = WebDriverWait(driver, 10)
+            element = wait.until(EC.presence_of_element_located((By.XPATH, page_list_xpath )))
+            nextPage = driver.find_element(By.XPATH, next_page_xpath)
+            nextPage.send_keys(Keys.RETURN)
+            
+            time.sleep(2)
+            lead_list_page_urls.append(driver.current_url)
+        except (StaleElementReferenceException , TimeoutException):
+            curr-=1
+            driver.refresh()
+
+def get_num_of_lead_list_pages(driver):
+    # I want to know the number of pages of search results   
+    # Xpaths needed fot this function
+    pagenation_list_xpath = '//main[@id="content-main"]//ul[@class="artdeco-pagination__pages artdeco-pagination__pages--number"]'
+    page_number_xpath = '//main[@id="content-main"]//ul[@class="artdeco-pagination__pages artdeco-pagination__pages--number"]/li[last()]/button/span'
+    
+    try:
+        wait = WebDriverWait(driver, 5)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, pagenation_list_xpath)))
+        page_num = driver.find_element(By.XPATH, page_number_xpath).text
+        page_num = int(page_num)
+
+    except NoSuchElementException:
+        print("There is 1 page.")
+        return 1
+        
+    except (StaleElementReferenceException , TimeoutException):
+        return 0
+
+    return page_num
 
 def extractFromAccountPages():
     #Take record of time that this program started running.
@@ -143,7 +332,7 @@ def leads_search():
     #for title in job_titles_list:
     #    select_title_in_search(driver, title)
 
-    driver.get('https://www.linkedin.com/sales/search/people?doFetchHeroCard=false&logHistory=true&rsLogId=1440626332&searchSessionId=Fl2Sd0y0QfS%2BJJuxD8glLA%3D%3D&seniorityIncluded=7%2C8%2C6')
+    driver.get('https://www.linkedin.com/sales/search/people?doFetchHeroCard=false&logHistory=true&rsLogId=1444596084&searchSessionId=53Zo2ebMTQCFV9dK3ZBTNQ%3D%3D&seniorityIncluded=8%2C7%2C6')
     time.sleep(3)
     #Following line of code has been commented out because the Linkedin returns too many request message.
     select_companies_in_search(driver, companies_list)
